@@ -3,14 +3,17 @@
 # 8 维从官方 ckpt 部分加载，training.debug=true（2 epoch × 3 步，含采样、attention map、存 ckpt）。
 #
 # 用法：
-#   ./smoke_h100_dataset.sh <数据集名>            # Datasets/<数据集名>/ 下所有 *.zarr 一起训
+#   bash smoke_h100_dataset.sh <数据集名>         # Datasets/<数据集名>/ 下所有 *.zarr 一起训
 #
+# 目前只支持 8 维（写死了 shape_meta=[8] 和部分加载）。
 # 成功判据：exit 0、打印 4 行 [skip_mismatch] random init、checkpoints/ 里有 ckpt。
-# debug 的 ckpt 没用（每个 2.2 GB），确认落盘后删掉，日志留在 smoke_out_local/<数据集名>/。
+# debug 的 ckpt 没用（每个 2.2 GB），确认落盘后删掉。日志在 smoke_out_local/<数据集名>.log，
+# 其余输出在 smoke_out_local/<数据集名>/（都在 H100 包下）。
+# smoke_out_local/<数据集名>/ 已存在（上次冒烟的输出）时脚本拒跑，要重跑先删掉它。
 # 5070 Ti 16 GB 所以 batch 12；H100 上用默认 48。
 set -euo pipefail
 
-[ $# -eq 1 ] || { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+[ $# -eq 1 ] || { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
 NAME=$1
 R=${H100_ROOT:-$HOME/H100_dexgraspvla}
 IMG=dexgraspvla:cu128
