@@ -1,0 +1,1 @@
+python inference.py --save_deployment_data --gen_attn_map

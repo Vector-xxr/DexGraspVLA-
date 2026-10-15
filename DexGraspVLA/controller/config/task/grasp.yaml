@@ -1,0 +1,36 @@
+name: grasp
+
+image_shape: [3, 518, 518]
+mask_image_shape: [4, 518, 518]
+dataset_paths:
+ - data/grasp_demo_example
+
+shape_meta: &shape_meta
+  obs:
+    right_cam_img:
+      shape: ${task.image_shape}
+      type: rgb
+      horizon: ${n_obs_steps}
+    rgbm:
+      shape: ${task.mask_image_shape}
+      type: rgbm
+      horizon: ${n_obs_steps}
+    right_state:
+      shape: [13]
+      type: low_dim
+      horizon: ${n_obs_steps}
+  action:
+    shape: [13]
+    horizon: ${n_action_steps}
+
+env_runner:
+  _target_: controller.env_runner.real_grasp_image_runner.RealGraspImageRunner
+
+dataset:
+  _target_: controller.dataset.mask_image_dataset.MaskImageDataset
+  zarr_paths: ${task.dataset_paths}
+  horizon: ${n_action_steps}
+  pad_before: ${eval:'${n_obs_steps}-1+${n_latency_steps}'}
+  pad_after: ${eval:'${n_action_steps}-1'}
+  seed: 42
+  val_ratio: 0

@@ -1,0 +1,20 @@
+# ── 2026-10-15 起用本仓库管理时加的：不进 git 的东西（见工作区根 迁移须知.md）──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+# 运行日志
+logs/
+Log/
+_rokae_log_/
+wandb/
+# 备份
+*.bak*
+# 私钥、证书：绝不入库
+*.pem
+*.key
+
+# 模型权重和数据集、训练输出
+/weights/
+/DexGraspVLA/data/
+/third_party/Cutie/weights/

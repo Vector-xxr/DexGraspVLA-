@@ -1,0 +1,71 @@
+diff --git a/controller/model/vision/obs_encoder.py b/controller/model/vision/obs_encoder.py
+index 68f1c7d..089d0f7 100644
+--- a/controller/model/vision/obs_encoder.py
++++ b/controller/model/vision/obs_encoder.py
+@@ -124,7 +124,7 @@ class ObsEncoder(ModuleAttrMixin):
+ 
+         # Create state_net to process robot arm and dexterous hand states
+         self.state_net = nn.Sequential(
+-            nn.Linear(13, 256),
++            nn.Linear(shape_meta['obs']['right_state']['shape'][0], 256),
+             nn.LayerNorm(256),
+             nn.GELU(),
+             nn.Dropout(0.1),
+diff --git a/controller/workspace/train_dexgraspvla_controller_workspace.py b/controller/workspace/train_dexgraspvla_controller_workspace.py
+index a1cd542..f881ade 100644
+--- a/controller/workspace/train_dexgraspvla_controller_workspace.py
++++ b/controller/workspace/train_dexgraspvla_controller_workspace.py
+@@ -18,6 +18,7 @@ import random
+ import tqdm
+ import numpy as np
+ import pickle
++import dill
+ 
+ from controller.common.pytorch_util import dict_apply
+ from controller.workspace.base_workspace import BaseWorkspace
+@@ -58,11 +59,44 @@ class TrainDexGraspVLAControllerWorkspace(BaseWorkspace):
+ 
+         if cfg.policy.start_ckpt_path is not None:
+             print(f"Starting from checkpoint {cfg.policy.start_ckpt_path}")
+-            self.load_checkpoint(path=cfg.policy.start_ckpt_path)
++            if cfg.training.get('start_ckpt_skip_mismatch', False):
++                self.load_model_weights_skip_mismatch(cfg.policy.start_ckpt_path)
++            else:
++                self.load_checkpoint(path=cfg.policy.start_ckpt_path)
+ 
+         self.global_step = 0
+         self.epoch = 0
+ 
++    def load_model_weights_skip_mismatch(self, path):
++        """
++        Fine-tune from a checkpoint whose action/state dim differs from ours
++        (e.g. 13-DoF arm+hand checkpoint -> 8-DoF arm+gripper data).
++        Copies every model weight whose shape matches; mismatched ones keep
++        their random init. Only the model is loaded: pickles such as
++        _output_dir/global_step/epoch are NOT restored, and the normalizer is
++        left empty because run() refits it from the dataset.
++        """
++        payload = torch.load(open(path, 'rb'), pickle_module=dill, map_location='cpu', weights_only=False)
++        src = payload['state_dicts']['model']
++        dst = self.model.state_dict()
++        loadable = {k: v for k, v in src.items() if k in dst and v.shape == dst[k].shape}
++        mismatched = [(k, tuple(v.shape), tuple(dst[k].shape)) for k, v in src.items()
++                      if k in dst and v.shape != dst[k].shape]
++        not_in_model = [k for k in src if k not in dst and not k.startswith('normalizer.')]
++        not_in_ckpt = [k for k in dst if k not in src]
++        self.model.load_state_dict(loadable, strict=False)
++
++        n_loaded = sum(v.numel() for v in loadable.values())
++        n_total = sum(v.numel() for v in dst.values())
++        print(f"[skip_mismatch] loaded {len(loadable)}/{len(dst)} tensors "
++              f"({n_loaded/1e6:.1f}M/{n_total/1e6:.1f}M params)")
++        for k, s, d in mismatched:
++            print(f"[skip_mismatch]   random init  {k}: ckpt {s} -> model {d}")
++        for k in not_in_ckpt:
++            print(f"[skip_mismatch]   random init  {k}: not in ckpt")
++        for k in not_in_model:
++            print(f"[skip_mismatch]   ignored      {k}: not in model")
++
+     def run(self):
+         cfg = copy.deepcopy(self.cfg)
+         

@@ -1,0 +1,65 @@
+# Robot Configuration
+robot:
+  # DOF limits for robot arms
+  dof_limits:
+    lower: [-3.1, -2.268, -3.1, -2.355, -3.1, -2.233, -6.28]
+    upper: [3.1, 2.268, 3.1, 2.355, 3.1, 2.233, 6.28]
+  
+  # Hand configuration
+  hands:
+    left:
+      port: null
+      default_open: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    right:
+      port: null
+      default_open: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+  # Arm configuration
+  arms:
+    left:
+      ip: null
+      init_qpos: [-0.10979866, -1.37397554, -1.11486395, -0.99602451, 0.28651326, -0.55909878, 0.59166664]
+    right:
+      ip: null
+      init_qpos: [0.36939895, -1.42726047, 0.32529447, -0.78829542, -1.78686804, 0.85681702, 2.33696087]
+      placement_joint: [0.95171058, -1.10870292, 0.30105185, -1.85312083, -2.63649433, 0.25455627, 2.43874849]
+      return_medium_joint: [0.58597687, -0.72916365, 0.20774654, -1.24625233, -2.82404745, 1.29088039, 2.68651541]
+
+# Camera Configuration
+cameras:
+  right_first:
+    sn: null
+    resolution: [640, 480]
+  third:
+    sn: null
+    resolution: [640, 480]
+
+# Model Configuration
+sam:
+  checkpoint: null
+  model_type: "vit_h"
+
+planner:
+  api_key: "EMPTY"
+  base_url: null
+  model_name: null
+
+# Logging Configuration
+logging:
+  exp_name: "demo"
+
+# Control Parameters
+control:
+  arm_trajectory:
+    interpolation_num: 20  # 轨迹插值点数
+    position_error_threshold: 0.03  # 位置误差阈值
+  monitor:
+    max_episode_duration: 100  # 最大执行时间(秒)
+
+# Visualization Configuration
+visualization:
+  bbox:
+    color: [0.8, 0.2, 0.2]  # 边界框颜色 [R, G, B] 绿色
+    linewidth: 2        # 边界框线宽
+  mask:
+    color: [0.1, 0.5, 1, 0.6]  # 掩码颜色 [R, G, B, Alpha] 蓝色半透明

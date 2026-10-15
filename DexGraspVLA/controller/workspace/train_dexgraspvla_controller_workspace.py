@@ -1,0 +1,405 @@
+if __name__ == "__main__":
+    import sys
+    import os
+    import pathlib
+
+    ROOT_DIR = str(pathlib.Path(__file__).parent.parent.parent)
+    sys.path.append(ROOT_DIR)
+    os.chdir(ROOT_DIR)
+
+import os
+import hydra
+import torch
+from omegaconf import OmegaConf
+import pathlib
+from torch.utils.data import DataLoader
+import copy
+import random
+import tqdm
+import numpy as np
+import pickle
+import dill
+
+from controller.common.pytorch_util import dict_apply
+from controller.workspace.base_workspace import BaseWorkspace
+from controller.policy.dexgraspvla_controller import DexGraspVLAController
+from controller.dataset.base_dataset import BaseImageDataset
+from controller.env_runner.base_image_runner import BaseImageRunner
+from controller.common.checkpoint_util import TopKCheckpointManager
+from controller.common.json_logger import JsonLogger
+from controller.model.diffusion.ema_model import EMAModel
+from controller.model.common.lr_scheduler import get_scheduler
+from accelerate import Accelerator
+OmegaConf.register_new_resolver("eval", eval, replace=True)
+
+# %%
+class TrainDexGraspVLAControllerWorkspace(BaseWorkspace):
+    include_keys = ['global_step', 'epoch']
+
+    def __init__(self, cfg: OmegaConf):
+        super().__init__(cfg)
+
+        # set seed
+        seed = cfg.training.seed
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+
+        # configure model
+        self.model: DexGraspVLAController
+        self.model = hydra.utils.instantiate(cfg.policy)
+
+        self.ema_model: DexGraspVLAController = None
+        if cfg.training.use_ema:
+            self.ema_model = copy.deepcopy(self.model)
+
+        # do not save optimizer if resume=False
+        if not cfg.training.resume:
+            self.exclude_keys = ['optimizer']
+
+        if cfg.policy.start_ckpt_path is not None:
+            print(f"Starting from checkpoint {cfg.policy.start_ckpt_path}")
+            if cfg.training.get('start_ckpt_skip_mismatch', False):
+                self.load_model_weights_skip_mismatch(cfg.policy.start_ckpt_path)
+            else:
+                self.load_checkpoint(path=cfg.policy.start_ckpt_path)
+
+        self.global_step = 0
+        self.epoch = 0
+
+    def load_model_weights_skip_mismatch(self, path):
+        """
+        Fine-tune from a checkpoint whose action/state dim differs from ours
+        (e.g. 13-DoF arm+hand checkpoint -> 8-DoF arm+gripper data).
+        Copies every model weight whose shape matches; mismatched ones keep
+        their random init. Only the model is loaded: pickles such as
+        _output_dir/global_step/epoch are NOT restored, and the normalizer is
+        left empty because run() refits it from the dataset.
+        """
+        payload = torch.load(open(path, 'rb'), pickle_module=dill, map_location='cpu', weights_only=False)
+        src = payload['state_dicts']['model']
+        dst = self.model.state_dict()
+        loadable = {k: v for k, v in src.items() if k in dst and v.shape == dst[k].shape}
+        mismatched = [(k, tuple(v.shape), tuple(dst[k].shape)) for k, v in src.items()
+                      if k in dst and v.shape != dst[k].shape]
+        not_in_model = [k for k in src if k not in dst and not k.startswith('normalizer.')]
+        not_in_ckpt = [k for k in dst if k not in src]
+        self.model.load_state_dict(loadable, strict=False)
+
+        n_loaded = sum(v.numel() for v in loadable.values())
+        n_total = sum(v.numel() for v in dst.values())
+        print(f"[skip_mismatch] loaded {len(loadable)}/{len(dst)} tensors "
+              f"({n_loaded/1e6:.1f}M/{n_total/1e6:.1f}M params)")
+        for k, s, d in mismatched:
+            print(f"[skip_mismatch]   random init  {k}: ckpt {s} -> model {d}")
+        for k in not_in_ckpt:
+            print(f"[skip_mismatch]   random init  {k}: not in ckpt")
+        for k in not_in_model:
+            print(f"[skip_mismatch]   ignored      {k}: not in model")
+
+    def run(self):
+        cfg = copy.deepcopy(self.cfg)
+        
+        # Set GPU device before initializing accelerator
+        local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        torch.cuda.set_device(local_rank)
+        accelerator = Accelerator(
+            log_with='wandb',
+            mixed_precision='bf16',  # Enable BF16 mixed precision training
+            device_placement=True
+        )
+
+        if accelerator.is_main_process:
+            print(f"Using mixed precision: {accelerator.mixed_precision}")
+            print(f"Using device: {accelerator.device}")
+            print(f"Local rank: {local_rank}")
+            if torch.cuda.is_available():
+                print(f"CUDA Device: {torch.cuda.get_device_name(local_rank)}")
+                print(f"CUDA Capability: {torch.cuda.get_device_capability(local_rank)}")
+
+        wandb_cfg = OmegaConf.to_container(cfg.logging, resolve=True)
+        wandb_cfg.pop('project')
+        wandb_cfg['mode'] = "offline"
+        accelerator.init_trackers(
+            project_name=cfg.logging.project,
+            config=OmegaConf.to_container(cfg, resolve=True),
+            init_kwargs={"wandb": wandb_cfg}
+        )
+
+        self.optimizer = self.model.get_optimizer(**cfg.optimizer)
+
+        if cfg.training.use_ema:
+            self.ema_model = copy.deepcopy(self.model)
+
+        # configure dataset
+        dataset: BaseImageDataset
+        dataset = hydra.utils.instantiate(cfg.task.dataset)
+        train_dataloader = DataLoader(dataset, **cfg.dataloader)
+
+        # compute normalizer on the main process and save to disk
+        normalizer_path = os.path.join(self.output_dir, 'normalizer.pkl')
+        if accelerator.is_main_process:
+            normalizer = dataset.get_normalizer()
+            pickle.dump(normalizer, open(normalizer_path, 'wb'))
+
+        # load normalizer on all processes
+        accelerator.wait_for_everyone()
+        normalizer = pickle.load(open(normalizer_path, 'rb'))
+
+        # configure validation dataset
+        val_dataset = dataset.get_validation_dataset()
+        val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
+
+        self.model.set_normalizer(normalizer)
+        if cfg.training.use_ema:
+            self.ema_model.set_normalizer(normalizer)
+
+        # configure lr scheduler
+        lr_scheduler = get_scheduler(
+            cfg.training.lr_scheduler,
+            optimizer=self.optimizer,
+            num_warmup_steps=cfg.training.lr_warmup_steps,
+            num_training_steps=(
+                len(train_dataloader) * cfg.training.num_epochs) \
+                    // cfg.training.gradient_accumulate_every,
+            # pytorch assumes stepping LRScheduler every epoch
+            # however huggingface diffusers steps it every batch
+            last_epoch=self.global_step-1
+        )
+
+        # configure ema
+        ema: EMAModel = None
+        if cfg.training.use_ema:
+            ema = hydra.utils.instantiate(
+                cfg.ema,
+                model=self.ema_model)
+
+        # configure env
+        env_runner: BaseImageRunner
+        env_runner = hydra.utils.instantiate(
+            cfg.task.env_runner,
+            output_dir=self.output_dir)
+        assert isinstance(env_runner, BaseImageRunner)
+
+        # configure checkpoint
+        topk_manager = TopKCheckpointManager(
+            save_dir=os.path.join(self.output_dir, 'checkpoints'),
+            **cfg.checkpoint.topk
+        )
+
+        # accelerator
+        train_dataloader, val_dataloader, self.model, self.optimizer, lr_scheduler = accelerator.prepare(
+            train_dataloader, val_dataloader, self.model, self.optimizer, lr_scheduler
+        )
+        device = self.model.device
+        if self.ema_model is not None:
+            self.ema_model.to(device)
+
+        # save batch for sampling
+        train_sampling_batch = None
+
+        if cfg.training.debug:
+            cfg.training.num_epochs = 2
+            cfg.training.max_train_steps = 3
+            cfg.training.max_val_steps = 3
+            cfg.training.rollout_every = 1
+            cfg.training.checkpoint_every = 1
+            cfg.training.val_every = 1
+            cfg.training.sample_every = 1
+
+        # training loop
+        log_path = os.path.join(self.output_dir, 'logs.json.txt')
+        with JsonLogger(log_path) as json_logger:
+            for local_epoch_idx in range(cfg.training.num_epochs):
+                self.model.train()
+
+                step_log = dict()
+
+                train_losses = list()
+                with tqdm.tqdm(train_dataloader, desc=f"Training epoch {self.epoch}", 
+                        leave=False, mininterval=cfg.training.tqdm_interval_sec,
+                        disable=not accelerator.is_main_process) as tepoch:
+                    for batch_idx, batch in enumerate(tepoch):
+                        # device transfer
+                        batch = dict_apply(batch, lambda x: x.to(device, non_blocking=True))
+                        if train_sampling_batch is None:
+                            train_sampling_batch = batch
+
+                        # always use the latest batch
+                        train_sampling_batch = batch
+
+                        # compute loss
+                        raw_loss = self.model(batch, training=True)
+                        loss = raw_loss / cfg.training.gradient_accumulate_every
+                        accelerator.backward(loss)
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=0.5)
+
+                        # step optimizer
+                        if self.global_step % cfg.training.gradient_accumulate_every == 0:
+                            self.optimizer.step()
+                            self.optimizer.zero_grad()
+                            lr_scheduler.step()
+                        
+                        # update ema
+                        if cfg.training.use_ema:
+                            ema.step(accelerator.unwrap_model(self.model))
+
+                        # logging
+                        raw_loss_cpu = raw_loss.item()
+                        tepoch.set_postfix(loss=raw_loss_cpu, refresh=False)
+                        train_losses.append(raw_loss_cpu)
+                        step_log = {
+                            'train_loss': raw_loss_cpu,
+                            'global_step': self.global_step,
+                            'epoch': self.epoch,
+                            'lr': lr_scheduler.get_last_lr()[0]
+                        }
+
+                        is_last_batch = (batch_idx == (len(train_dataloader)-1))
+                        if not is_last_batch:
+                            # log of last step is combined with validation and rollout
+                            accelerator.log(step_log, step=self.global_step)
+                            json_logger.log(step_log)
+                            self.global_step += 1
+
+                        if (cfg.training.max_train_steps is not None) \
+                            and batch_idx >= (cfg.training.max_train_steps-1):
+                            break
+
+                # at the end of each epoch
+                # replace train_loss with epoch average
+                train_loss = np.mean(train_losses)
+                step_log['train_loss'] = train_loss
+
+                # ========= eval for this epoch ==========
+                policy = accelerator.unwrap_model(self.model)
+                if cfg.training.use_ema:
+                    policy = self.ema_model
+                policy.eval()
+
+                # run rollout
+                if (self.epoch % cfg.training.rollout_every) == 0:
+                    runner_log = env_runner.run(policy)
+                    # log all
+                    step_log.update(runner_log)
+
+                # run validation
+                if (self.epoch % cfg.training.val_every) == 0 and len(val_dataloader) > 0:
+                    with torch.no_grad():
+                        val_losses = list()
+                        with tqdm.tqdm(val_dataloader, desc=f"Validation epoch {self.epoch}", 
+                                leave=False, mininterval=cfg.training.tqdm_interval_sec, 
+                                disable=not accelerator.is_main_process) as tepoch:
+                            for batch_idx, batch in enumerate(tepoch):
+                                batch = dict_apply(batch, lambda x: x.to(device, non_blocking=True))
+                                loss = self.model(batch, training=False)
+                                val_losses.append(loss)
+                                if (cfg.training.max_val_steps is not None) \
+                                    and batch_idx >= (cfg.training.max_val_steps-1):
+                                    break
+                        
+                        if len(val_losses) > 0:
+                            # Collect validation losses from all processes
+                            val_losses = torch.stack(val_losses)
+                            val_losses = accelerator.gather(val_losses)
+                            
+                            # Calculate mean loss on main process
+                            if accelerator.is_main_process:
+                                val_loss = torch.mean(val_losses).item()
+                                step_log['val_loss'] = val_loss
+
+                def log_action_mse(step_log, category, pred_action, gt_action):
+                    B, T, _ = pred_action.shape
+                    pred_action = pred_action.view(B, T, -1)
+                    gt_action = gt_action.view(B, T, -1)
+                    step_log[f'{category}_action_mse_error'] = torch.nn.functional.mse_loss(pred_action, gt_action)
+                # run diffusion sampling on a training batch
+                if (self.epoch % cfg.training.sample_every) == 0 and accelerator.is_main_process:
+                    with torch.no_grad():
+                        # sample trajectory from training set, and evaluate difference
+                        batch = dict_apply(train_sampling_batch, lambda x: x.to(device, non_blocking=True))
+                        gt_action = batch['action']
+                        if cfg.training.gen_attn_map:
+                            train_sample_attn_maps_dir = os.path.join(self.output_dir, 'train_sample_attn_maps')
+                            os.makedirs(train_sample_attn_maps_dir, exist_ok=True)
+                            output_path = os.path.join(train_sample_attn_maps_dir, f'{self.epoch}.pkl')
+                        else:
+                            output_path = None
+                        pred_action = policy.predict_action(batch['obs'], output_path)
+                        log_action_mse(step_log, 'train', pred_action, gt_action)
+
+                        if len(val_dataloader) > 0:
+                            val_sampling_batch = next(iter(val_dataloader))
+                            batch = dict_apply(val_sampling_batch, lambda x: x.to(device, non_blocking=True))
+                            gt_action = batch['action']
+                            if cfg.training.gen_attn_map:
+                                val_sample_attn_maps_dir = os.path.join(self.output_dir, 'val_sample_attn_maps')
+                                os.makedirs(val_sample_attn_maps_dir, exist_ok=True)
+                                output_path = os.path.join(val_sample_attn_maps_dir, f'{self.epoch}.pkl')
+                            else:
+                                output_path = None
+                            pred_action = policy.predict_action(batch['obs'], output_path)
+                            log_action_mse(step_log, 'val', pred_action, gt_action)
+
+                        del batch
+                        del gt_action
+                        del pred_action
+                
+                # checkpoint
+                if (self.epoch % cfg.training.checkpoint_every) == 0 and accelerator.is_main_process:
+                    # unwrap the model to save ckpt
+                    model_ddp = self.model
+                    self.model = accelerator.unwrap_model(self.model)
+
+                    # checkpointing
+                    if cfg.checkpoint.save_last_ckpt:
+                        self.save_checkpoint()
+                    if cfg.checkpoint.save_last_snapshot:
+                        self.save_snapshot()
+
+                    # sanitize metric names
+                    metric_dict = dict()
+                    for key, value in step_log.items():
+                        new_key = key.replace('/', '_')
+                        metric_dict[new_key] = value
+                    
+                    # We can't copy the last checkpoint here
+                    # since save_checkpoint uses threads.
+                    # therefore at this point the file might have been empty!
+                    topk_ckpt_path = topk_manager.get_ckpt_path(metric_dict)
+
+                    if topk_ckpt_path is not None:
+                        self.save_checkpoint(path=topk_ckpt_path)
+
+                    # recover the DDP model
+                    self.model = model_ddp
+
+                # Save model at specific epochs without affecting best model saving
+                if self.epoch in [40, 60, 80, 100, 120] and accelerator.is_main_process:
+                    model_ddp = self.model
+                    self.model = accelerator.unwrap_model(self.model)
+                    save_dir = os.path.join(self.output_dir, 'epoch_checkpoints')
+                    os.makedirs(save_dir, exist_ok=True)
+                    self.save_checkpoint(path=os.path.join(save_dir, f'epoch={self.epoch}.ckpt'))
+                    self.model = model_ddp
+
+                # ========= eval end for this epoch ==========
+                # end of epoch
+                # log of last step is combined with validation and rollout
+                accelerator.log(step_log, step=self.global_step)
+                json_logger.log(step_log)
+                self.global_step += 1
+                self.epoch += 1
+
+        accelerator.end_training()
+
+@hydra.main(
+    version_base=None,
+    config_path=str(pathlib.Path(__file__).parent.parent.joinpath("config")), 
+    config_name=pathlib.Path(__file__).stem)
+def main(cfg):
+    workspace = TrainDexGraspVLAControllerWorkspace(cfg)
+    workspace.run()
+
+if __name__ == "__main__":
+    main()
