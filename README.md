@@ -4,6 +4,13 @@
 
 下面的命令都在项目根目录下跑：`cd ~/yuhang_workspace/算法/DexGraspVLA`。
 
+> [!NOTE]
+> **放在 GitHub 上要知道的**：这个仓库原本是一个更大工作区里的项目（`<工作区>/算法/DexGraspVLA/`）。
+> - 模型权重（`weights/`、`third_party/Cutie/weights/`）、数据集和训练输出（`DexGraspVLA/data/`）不在仓库里，下载和摆放见 [`环境说明.md`](环境说明.md) 第 5 节。
+> - 数据转换器 `to_dexgraspvla.py` 在另一个仓库 [VisionPro_teleop_DexterousHand](https://github.com/Vector-xxr/VisionPro_teleop_DexterousHand) 的 `VR设备/` 下；H100 离线包（`~/H100_dexgraspvla`）不在任何仓库里。
+> - 文中指向 `../../工作区说明.md`、`../../数据_硬件/…` 的链接是原工作区里的其他项目，在这里打不开。
+> - `DexGraspVLA/` 是上游 [Psi-Robot/DexGraspVLA](https://github.com/Psi-Robot/DexGraspVLA) 的代码（改了 2 个文件），`third_party/Cutie/` 是上游 [hkchengrex/Cutie](https://github.com/hkchengrex/Cutie)，出处和改动见 [`上游来源.md`](上游来源.md)。
+
 ## 目录地图
 
 ```
@@ -143,7 +150,7 @@ rm -rf /tmp/dexgraspvla_test      # 看完质检图再删
 - 工作区换了位置，要改 `~/miniforge3/envs/dexgraspvla/lib/python3.11/site-packages/_editable_impl_cutie.pth` 里的 Cutie 路径（[`工作区说明.md`](../../工作区说明.md) 6.3 节）。
 - H100 包里有一份上游代码副本 `~/H100_dexgraspvla/DexGraspVLA/`（10-15 核对和本地一致）。改了上游代码，要同步过去再重新冒烟。
 - `make_h100_dataset.sh`、`smoke_h100_dataset.sh` 只支持 8 维；`smoke_out_local/<数据集名>/` 已存在时冒烟脚本拒跑，要先删掉。
-- 上游没有许可证文件，不能公开（[`上游来源.md`](上游来源.md)）。
+- 上游 DexGraspVLA 没有许可证文件；本仓库 10-16 在知情的情况下决定公开，出处见 [`上游来源.md`](上游来源.md)。
 
 ## 文档索引
 
