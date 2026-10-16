@@ -6,8 +6,8 @@
 # 实测（2026-10-08，真实 train.py）：显存峰值约 13.7 GB（几次实测在 13.5~13.7 之间），16 GB 的卡余量约 2 GB。
 # bf16 写死在 workspace 代码里，单卡不需要 accelerate config。
 #
-# 用法（不用先 conda activate；路径参数写绝对路径，因为脚本会先切到 DexGraspVLA/ 子目录）：
-#   bash train_5070ti.sh                                # 默认数据 DexGraspVLA/data/grasp_demo_example
+# 用法（不用先 conda activate；脚本会先切到仓库根目录，相对路径按根目录算，稳妥起见写绝对路径）：
+#   bash train_5070ti.sh                                # 默认数据 data/grasp_demo_example
 #   bash train_5070ti.sh training.debug=true            # 冒烟：2 epoch × 3 步
 #   bash train_5070ti.sh "policy.start_ckpt_path='/abs/xx.ckpt'"   # 从同维度检查点接着训（严格加载）
 #   bash train_5070ti.sh "policy.start_ckpt_path='/abs/官方.ckpt'" +training.start_ckpt_skip_mismatch=true ...
@@ -16,16 +16,16 @@
 #       ↑ 路径外面要有一层单引号：项目路径里有中文（「算法」），不加 hydra 会报 LexerNoViableAltException
 #   bash train_5070ti.sh ... 'task.shape_meta.obs.right_state.shape=[8]' 'task.shape_meta.action.shape=[8]'
 #       ↑ 7 臂 + 1 夹爪（HKVR）的数据；obs_encoder.py 的 state 输入维已改成跟 shape_meta 走
-# 输出：DexGraspVLA/data/outputs/<日期>/<时间>_.../（checkpoints、normalizer.pkl、logs.json.txt）
+# 输出：data/outputs/<日期>/<时间>_.../（checkpoints、normalizer.pkl、logs.json.txt）
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "$0")")"
 # DINOv2 的代码和权重用项目里的 weights/torch_home（普通文件，拷走就能断网训练），不去 ~/.cache/torch
 export TORCH_HOME="${TORCH_HOME:-$HERE/weights/torch_home}"
-cd "$HERE/DexGraspVLA"
+cd "$HERE"
 
 # wandb 的离线记录放工作区外：它会在当前目录建 wandb/latest-run 之类的软链接，
-# 留在项目里会让 git、复制、拷进移动硬盘出问题。检查点和训练输出照旧在 DexGraspVLA/data/outputs/。
+# 留在项目里会让 git、复制、拷进移动硬盘出问题。检查点和训练输出照旧在 data/outputs/。
 export WANDB_DIR="${WANDB_DIR:-$HOME/wandb_dexgraspvla}"
 mkdir -p "$WANDB_DIR"
 

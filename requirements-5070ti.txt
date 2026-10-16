@@ -43,7 +43,9 @@ rich                      # inference_utils/utils.py
 # ── 正式训练的数据预处理：目标物体掩码（2026-10-08 装）────────────────────
 # SAM：pip install git+https://github.com/facebookresearch/segment-anything.git
 segment_anything @ git+https://github.com/facebookresearch/segment-anything.git@dca509fe793f601edb92606367a655c15ac00fdf
-# Cutie：源码在本项目的 third_party/Cutie（ec5cdd4），**必须 --no-deps**（在项目根目录下装）：
+# Cutie：不在 git 里（和上游一样按官方说明另装）。本机放在 third_party/Cutie，用的提交是 ec5cdd4，
+# **必须 --no-deps**（在仓库根目录下）：
+#   git clone https://github.com/hkchengrex/Cutie.git third_party/Cutie && git -C third_party/Cutie checkout ec5cdd4
 #   pip install --no-deps -e third_party/Cutie
 # 它的 pyproject 拉 PySide6/gradio/pyqtdarktheme 等 GUI 依赖，推理核心只需要下面三个
 gitpython==3.2.0
