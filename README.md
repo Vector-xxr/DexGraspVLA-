@@ -108,6 +108,7 @@ bash train_5070ti.sh training.debug=True
 | 文档 | 内容 |
 |---|---|
 | [`环境说明.md`](环境说明.md) | conda 环境、为什么不能用上游的 requirements、显存与 batch、权重放哪、训练命令、验证记录 |
+| [`待测试.md`](待测试.md) | 10-16 定的测试清单：软件（训练、数据、推理链路）和换夹爪后的硬件测试，做完一项勾一项 |
 | [`上游来源.md`](上游来源.md) | 上游仓库和提交号、改了什么、哪些不进 git |
 | [`上游改动_DexGraspVLA.patch`](上游改动_DexGraspVLA.patch) | 对上游 2 个文件的改动全文 |
 | [`requirements-5070ti.txt`](requirements-5070ti.txt) | `dexgraspvla` 环境的确切版本，以及偏离上游的原因 |
