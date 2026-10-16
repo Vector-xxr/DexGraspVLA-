@@ -1,11 +1,11 @@
-# DexGraspVLA（抓取控制器训练）
+# DexGraspVLA++（抓取控制器训练）
 
 在 RTX 5070 Ti 上单卡训练 DexGraspVLA 的抓取控制器；把 SO-101 主从臂采集的数据（8 维：7 臂 + 1 夹爪）转成训练用的 zarr（SAM + Cutie 生成目标掩码），打包成 H100 离线训练用的数据集。
 
-下面的命令都在项目根目录下跑：`cd ~/yuhang_workspace/算法/DexGraspVLA`。
+下面的命令都在项目根目录下跑：`cd ~/yuhang_workspace/算法/DexGraspVLA++`。
 
 > [!NOTE]
-> **放在 GitHub 上要知道的**：这个仓库原本是一个更大工作区里的项目（`<工作区>/算法/DexGraspVLA/`）。
+> **放在 GitHub 上要知道的**：这个仓库原本是一个更大工作区里的项目（`<工作区>/算法/DexGraspVLA++/`）。
 > - 模型权重（`weights/`、`third_party/Cutie/weights/`）、数据集和训练输出（`DexGraspVLA/data/`）不在仓库里，下载和摆放见 [`环境说明.md`](环境说明.md) 第 5 节。
 > - 数据转换器 `to_dexgraspvla.py` 在另一个仓库 [VisionPro_teleop_DexterousHand](https://github.com/Vector-xxr/VisionPro_teleop_DexterousHand) 的 `VR设备/` 下；H100 离线包（`~/H100_dexgraspvla`）不在任何仓库里。
 > - 文中指向 `../../工作区说明.md`、`../../数据_硬件/…` 的链接是原工作区里的其他项目，在这里打不开。
@@ -14,7 +14,7 @@
 ## 目录地图
 
 ```
-算法/DexGraspVLA/                   本项目，也是 git 仓库根
+算法/DexGraspVLA++/                   本项目，也是 git 仓库根
 ├── README.md                      本文件
 ├── 环境说明.md                     conda 环境、显存、训练命令、验证记录
 ├── 数据转换说明.md                  采集数据 → zarr：标框、掩码、检查、交付
