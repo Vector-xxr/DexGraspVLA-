@@ -239,10 +239,11 @@ bash train_5070ti.sh training.debug=True
 |---|---|
 | [`环境说明.md`](环境说明.md) | conda 环境、为什么不能用上游的 requirements、显存与 batch、权重放哪、训练命令、验证记录 |
 | [`待测试.md`](待测试.md) | 10-16 定的测试清单：软件（训练、数据、推理链路）和换夹爪后的硬件测试，做完一项勾一项 |
+| [`3D输入方案.md`](3D输入方案.md) | 10-30 定的改进方案：两路深度 → 每块基座系坐标加到 token 上；试采验证数据；对照实验怎么做（网络还没改） |
 | [`规划器测试/README.md`](规划器测试/README.md) | 10-17 规划器选型：看参考图框物体，各模型、各做法的结果，为什么用 qwen3-vl-plus，踩过的坑 |
 | [`上游来源.md`](上游来源.md) | 上游仓库和提交号、改了什么、哪些不进 git |
 | [`上游改动_DexGraspVLA.patch`](上游改动_DexGraspVLA.patch) | 对上游 2 个文件的改动全文 |
 | [`requirements-5070ti.txt`](requirements-5070ti.txt) | `dexgraspvla` 环境的确切版本，以及偏离上游的原因 |
 | [`README_DexGraspVLA.md`](README_DexGraspVLA.md) | 上游的说明 |
-| `算法/DexGraspVLA-/SO101/数据转换说明.md`（原工作区） | 自己的采集数据 → zarr 的全过程 |
+| [`SO101/数据转换说明.md`](SO101/数据转换说明.md) | 自己的采集数据 → zarr 的全过程 |
 | [`../../工作区说明.md`](../../工作区说明.md)（原工作区） | 整个工作区：结构、约定、迁移 |
