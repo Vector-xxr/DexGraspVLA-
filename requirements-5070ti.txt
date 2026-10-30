@@ -53,9 +53,14 @@ hickle==5.0.3
 pycocotools==2.0.11
 # 权重：weights/sam_vit_h_4b8939.pth；third_party/Cutie/weights/*.pth（两个都要在）
 
+# ── 规划器（10-22 补装，版本照上游 requirements.txt）─────────────────────
+# planner/dexgraspvla_planner.py 用；inference.py 顶层 import 了它，不装的话 inference.py 整个导不进来。
+# 只新增了 distro、jiter、sniffio 三个依赖，没有升级已有的包
+openai==1.63.2
+json_repair==0.36.1
+
 # ── 故意不装 ─────────────────────────────────────────────────────────────
 # xformers==0.0.29.post1  全仓 0 处 import，而且会把 torch 钉死回 2.5.1。
 #                         后果只是 DINOv2 打印 "xFormers is not available" 警告，
 #                         退回 PyTorch 原生 attention，功能不受影响
-# openai / json_repair    只被 planner/dexgraspvla_planner.py 用，暂不跑高层大脑
 # datasets==2.6.1         全仓 0 处 import

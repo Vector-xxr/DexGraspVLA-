@@ -1,0 +1,48 @@
+{
+  "note": "RGB-D 转基座系用的深度参数。**一次性从 RobotJev 复制**（出厂值，没独立标定），这样 camera_3d 不用跨项目找路径。",
+  "copied_at": "2026-10-29 17:46",
+  "top": {
+    "camera": "Gemini 335 (orbbec:CP0BB53000FC)",
+    "depth_aligned_to_color": true,
+    "mm_per_unit": 1.0,
+    "source": "OBSENSOR 取的深度已对齐彩色（见 RobotJev orbbec335_params.json 的 obsensor_depth_aligned_to_color），直接用彩色内参"
+  },
+  "wrist": {
+    "camera": "Gemini 305 (v4l2:/dev/ar5_cam_wrist，深度走 V4L2 Z16)",
+    "depth_aligned_to_color": false,
+    "mm_per_unit": 0.10000000149011612,
+    "depth_intrinsic": {
+      "fx": 375.13482666015625,
+      "fy": 375.13482666015625,
+      "cx": 316.4000244140625,
+      "cy": 237.0,
+      "width": 640,
+      "height": 480
+    },
+    "depth_to_color": {
+      "R": [
+        [
+          0.9999945163726807,
+          0.000550178752746433,
+          -0.003269230481237173
+        ],
+        [
+          -0.000550743832718581,
+          0.9999998211860657,
+          -0.00017194965039379895
+        ],
+        [
+          0.0032691352535039186,
+          0.00017374921299051493,
+          0.9999946355819702
+        ]
+      ],
+      "t_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "source": "RobotJev robojev/calibration/orbbec_params.json（读于 2026-09-28 10:37:30）"
+  }
+}

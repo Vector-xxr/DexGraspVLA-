@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-29",
+  "camera": "Gemini 305 (CV27864000V2) wrist",
+  "verdict": "刻度正确：V4L2 Z16 × 0.1 mm/unit",
+  "evidence": {
+    "sdk_scale": 0.1,
+    "sdk_raw_median_approx": 4121,
+    "v4l2_raw_matches_sdk": true,
+    "after_usb_reset": {
+      "corner_0.1raw_minus_trueZ_median_mm": -4.0,
+      "corner_rms_mm": 4.4,
+      "board_pixels_ratio_mm_per_raw": 0.1011,
+      "base_frame_board_dz_median_mm": 3.8
+    }
+  },
+  "false_alarm_earlier": {
+    "what": "同日早些时候测到 304 vs 363 mm（比值 0.833），曾以为要 ×0.119",
+    "why_likely": "那次彩色/深度可能不同步，或 OBSENSOR/SDK 用过之后 V4L2 深度流异常；USB 复位 305 后同一方法误差只剩 ~4 mm",
+    "do_not_use_scale": 0.119
+  },
+  "usage": "腕部深度：raw_uint16 * 0.1 = mm；depth_to_color 出厂 t≈0 可用；用前若刚跑过 SDK/OBSENSOR 先 USB 复位再开 V4L2"
+}

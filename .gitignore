@@ -4,6 +4,9 @@
 /data/
 # Cutie、SAM 等第三方库按官方说明另装（本机放在 third_party/，见 requirements-5070ti.txt），不进 git
 /third_party/
+# 规划器测试：实验室画面和结果不进公开仓库，只提交脚本
+/规划器测试/测试集/
+/规划器测试/结果/
 # 运行日志、wandb、备份、私钥
 logs/
 Log/

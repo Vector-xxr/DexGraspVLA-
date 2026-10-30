@@ -1,0 +1,55 @@
+# AR5 采集用的两路相机，给固定名字。两台都是 Orbbec，**都要插主机的 USB 3 口**（见下）。
+#
+# 装到位：
+#     sudo cp 99-ar5-cameras.rules /etc/udev/rules.d/
+#     sudo udevadm control --reload-rules && sudo udevadm trigger
+#     ls -l /dev/ar5_cam_*
+#
+# **两台都要插主机的 USB 3 口，别插那个 USB 2 hub。** 2026-09-28/29：两台 Orbbec +
+# 主臂串口挤在同一个 480M hub（Bus1 port10）上时，305 彩色流一帧不出（重启、软复位、
+# 厂家 SDK 都救不回来），335 的 MJPEG 画面下半撕裂发绿。挪到 Bus2 的 5000M 根口后
+# 两台都是 30.0 Hz。udev 按序列号认，换口不用改 config。
+#
+# 为什么要这条规则
+# ---------------
+# 原来 config.py 里填的是 by-path（`/dev/v4l/by-path/...-usb-0:10.3:1.4-...`）。
+# by-path 绑的是**物理插座**：2026-09-24 腕部相机卡死、拔插一次之后从 10.3 口
+# 挪到了 10.2，路径直接失效，collect 报「路径不存在（相机换了 USB 口，或者没插）」。
+# 而拔插正是这台 Orbbec 卡死时唯一的救法 —— 也就是说每救一次就要改一次 config。
+#
+# 那为什么不用现成的 by-id？**因为彩色节点没有 by-id。** 实测：
+#
+#     接口 1.0 -> video0,1,4,5,6,7     深度 / 元数据
+#     接口 1.4 -> video8,9             **彩色，要的是这个**
+#     接口 1.6 -> video10,11           深度
+#
+#     by-id 的六个链接指向 video10,11,4,5,6,7 —— 一个都不是 1.4
+#
+# udev 自带的 by-id 生成器跳过了 1.4 这个接口。所以只能自己写一条，
+# 直接按 `bInterfaceNumber=="04"` 匹配。
+
+# 腕部：Orbbec Gemini 305 的**彩色**节点。
+#
+# ⚠ **用 ENV{} 不用 ATTRS{}。** 一条规则里所有 `ATTRS{}` 必须匹配**同一个父设备**，
+# 而 `serial` 在 USB 设备上（1-10.2）、`bInterfaceNumber` 在接口上（1-10.2:1.4）——
+# 两个不同的父节点，凑不到一起，规则永远不触发。2026-09-24 第一版就是这么写的，
+# `udevadm test` 里那一行压根不出现，看起来像规则没被读到。
+# `ENV{}` 是 udev 算好的属性，没有这个限制。
+#
+#   ID_SERIAL_SHORT       这台相机独有，换台相机要改
+#   ID_USB_INTERFACE_NUM  04 = 彩色接口。00 和 06 是深度/元数据，
+#                         **打得开但一帧都不给**，read() 卡满 10 秒，
+#                         错误长得像相机坏了而不是地址填错了
+#   ID_V4L_CAPABILITIES   :capture: = 取流节点；同接口的元数据节点这一项是空的
+SUBSYSTEM=="video4linux", ENV{ID_SERIAL_SHORT}=="CV27864000V2", ENV{ID_USB_INTERFACE_NUM}=="04", ENV{ID_V4L_CAPABILITIES}==":capture:", SYMLINK+="ar5_cam_wrist", MODE="0666"
+
+# 顶部：Orbbec Gemini 335（2026-09-29 换上来，替掉了原来的绿联 1080P）。
+#
+# 和腕部 305 同一个厂商号 2bc5，**必须按序列号认**，按厂商号会两台都匹配。
+# 彩色节点的布局和 305 一样在接口 04（实测 video16，YUYV/MJPG）。
+#
+# ⚠ 这个名字 `ar5_cam_high` 原来指的是绿联，现在指 335 —— **同名不同相机、不同机位**，
+# 9/29 之前 cam_high 采的数据和之后的不能混。
+#
+# 原来绿联那条（按 idVendor 0c45 匹配）删掉了：绿联要是再插回来，它会和 335 抢这个名字。
+SUBSYSTEM=="video4linux", ENV{ID_SERIAL_SHORT}=="CP0BB53000FC", ENV{ID_USB_INTERFACE_NUM}=="04", ENV{ID_V4L_CAPABILITIES}==":capture:", SYMLINK+="ar5_cam_high", MODE="0666"

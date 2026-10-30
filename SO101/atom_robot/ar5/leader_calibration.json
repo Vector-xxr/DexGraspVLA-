@@ -1,0 +1,36 @@
+{
+  "axis_permutation": [
+    0,
+    1,
+    2
+  ],
+  "axis_signs": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "measured_at": "2026-09-16 17:57:00",
+  "leader_port": "/dev/ttyACM0",
+  "calib_id": "single_leader_arm",
+  "travel_mm": {
+    "x": [
+      329.8,
+      60.6,
+      104.8
+    ],
+    "y": [
+      -204.5,
+      419.8,
+      165.3
+    ],
+    "z": [
+      31.7,
+      6.7,
+      523.5
+    ]
+  },
+  "ambiguous_axes": [
+    "x",
+    "y"
+  ]
+}

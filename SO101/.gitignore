@@ -1,0 +1,18 @@
+# ── 2026-10-15 起用本仓库管理时加的：不进 git 的东西（见工作区根 工作区说明.md）──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+# 运行日志
+logs/
+Log/
+_rokae_log_/
+wandb/
+# 备份
+*.bak*
+# 私钥、证书：绝不入库
+*.pem
+*.key
+# 标定的原始采集（poses.npz 几十 MB、深度/点云数组）：不进 git，照片、脚本和结果 json 进
+/calib_poses*/**/*.npz
+/calib_poses*/**/*.npy

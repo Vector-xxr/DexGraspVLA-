@@ -1,0 +1,28 @@
+{
+  "sign_overrides": {
+    "shoulder_pan": -1.0,
+    "shoulder_lift": 1.0,
+    "elbow_flex": 1.0,
+    "wrist_roll": -1.0,
+    "wrist_flex": 1.0
+  },
+  "scale_overrides": {
+    "shoulder_pan": 1.0,
+    "shoulder_lift": 0.6172750256546454,
+    "wrist_flex": 0.40174827514775874
+  },
+  "centre_joints": [
+    -0.5272393833874645,
+    0.05544681415836798,
+    0.12175493134846063,
+    1.5711064785354472,
+    -1.6267866255527224,
+    0.10826452905699885,
+    0.012484206768408048
+  ],
+  "gripper_closed_deg": 55.5,
+  "gripper_open_deg": -55.5,
+  "measured_at": "2026-09-01 16:51:06",
+  "centre_measured_at": "2026-09-16 17:24:26",
+  "note": "wrist_roll 现在驱动 J7（±50°），旧缩放是给 J5（±178°）拟的；elbow_flex 的旧缩放是给 2026-09-01 那个中心姿态拟的，17:24 改中心之后超限 107%。两条都删掉让 configure() 重新拟合。 | 2026-09-22: wrist_roll 轴7→轴5，锁轴3+轴7；夹爪扳机方向对调"
+}

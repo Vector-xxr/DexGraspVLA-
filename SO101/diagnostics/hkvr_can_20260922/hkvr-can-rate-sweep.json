@@ -1,0 +1,3672 @@
+{
+  "port": "/dev/ttyUSB0",
+  "uart_baud": 115200,
+  "timestamp": "2026-09-22 13:51:43",
+  "source": "https://python-can.readthedocs.io/en/main/_modules/can/interfaces/robotell.html",
+  "exchanges": [
+    {
+      "name": "passive",
+      "tx": "",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0140420f009728000808ff01002e5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "40420f0097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "uart_bitrate",
+      "tx": "aaaa90feff01000000000000000004ff0101935555",
+      "rx": "aaaa90feff0100c201009728000808ff0100205555",
+      "frames": [
+        {
+          "id": 33554064,
+          "dlc": 8,
+          "data": "00c2010097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "auto_retransmit",
+      "tx": "aaaaa0feff01000000000000000001ff0101a05555",
+      "rx": "aaaaa0feff01000000009728000808ff01006d5555",
+      "frames": [
+        {
+          "id": 33554080,
+          "dlc": 8,
+          "data": "0000000097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "auto_bus_management",
+      "tx": "aaaab0feff01000000000000000001ff0101b05555",
+      "rx": "aaaab0feff01000000009728000808ff01007d5555",
+      "frames": [
+        {
+          "id": 33554096,
+          "dlc": 8,
+          "data": "0000000097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "serial_1",
+      "tx": "aaaaf0ffff01000000000000000008ff0101f85555",
+      "rx": "aaaaf0ffff01520008000500005308ff0100a95555",
+      "frames": [
+        {
+          "id": 33554416,
+          "dlc": 8,
+          "data": "5200080005000053",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "serial_2",
+      "tx": "aaaaf1ffff01000000000000000008ff0101f95555",
+      "rx": "aaaaf1ffff014e4a31560000000008ff0100175555",
+      "frames": [
+        {
+          "id": 33554417,
+          "dlc": 8,
+          "data": "4e4a315600000000",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_0",
+      "tx": "aaaae0feff01000000000000000008ff0101e75555",
+      "rx": "aaaae0feff01000000800000000008ff0100665555",
+      "frames": [
+        {
+          "id": 33554144,
+          "dlc": 8,
+          "data": "0000008000000000",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_1",
+      "tx": "aaaae1feff01000000000000000008ff0101e85555",
+      "rx": "aaaae1feff01000000c00000000008ff0100a75555",
+      "frames": [
+        {
+          "id": 33554145,
+          "dlc": 8,
+          "data": "000000c000000000",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_2",
+      "tx": "aaaae2feff01000000000000000008ff0101e95555",
+      "rx": "aaaae2feff01ffffff5fffffff1f08ff0100605555",
+      "frames": [
+        {
+          "id": 33554146,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_3",
+      "tx": "aaaae3feff01000000000000000008ff0101ea5555",
+      "rx": "aaaae3feff01ffffff5fffffff1f08ff0100615555",
+      "frames": [
+        {
+          "id": 33554147,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_4",
+      "tx": "aaaae4feff01000000000000000008ff0101eb5555",
+      "rx": "aaaae4feff01ffffff5fffffff1f08ff0100625555",
+      "frames": [
+        {
+          "id": 33554148,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_5",
+      "tx": "aaaae5feff01000000000000000008ff0101ec5555",
+      "rx": "aaaae5feff01ffffff5fffffff1f08ff0100635555",
+      "frames": [
+        {
+          "id": 33554149,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_6",
+      "tx": "aaaae6feff01000000000000000008ff0101ed5555",
+      "rx": "aaaae6feff01ffffff5fffffff1f08ff0100645555",
+      "frames": [
+        {
+          "id": 33554150,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_7",
+      "tx": "aaaae7feff01000000000000000008ff0101ee5555",
+      "rx": "aaaae7feff01ffffff5fffffff1f08ff0100655555",
+      "frames": [
+        {
+          "id": 33554151,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_8",
+      "tx": "aaaae8feff01000000000000000008ff0101ef5555",
+      "rx": "aaaae8feff01ffffff5fffffff1f08ff0100665555",
+      "frames": [
+        {
+          "id": 33554152,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_9",
+      "tx": "aaaae9feff01000000000000000008ff0101f05555",
+      "rx": "aaaae9feff01ffffff5fffffff1f08ff0100675555",
+      "frames": [
+        {
+          "id": 33554153,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_10",
+      "tx": "aaaaeafeff01000000000000000008ff0101f15555",
+      "rx": "aaaaeafeff01ffffff5fffffff1f08ff0100685555",
+      "frames": [
+        {
+          "id": 33554154,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_11",
+      "tx": "aaaaebfeff01000000000000000008ff0101f25555",
+      "rx": "aaaaebfeff01ffffff5fffffff1f08ff0100695555",
+      "frames": [
+        {
+          "id": 33554155,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_12",
+      "tx": "aaaaecfeff01000000000000000008ff0101f35555",
+      "rx": "aaaaecfeff01ffffff5fffffff1f08ff01006a5555",
+      "frames": [
+        {
+          "id": 33554156,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "filter_13",
+      "tx": "aaaaedfeff01000000000000000008ff0101f45555",
+      "rx": "aaaaedfeff01ffffff5fffffff1f08ff01006b5555",
+      "frames": [
+        {
+          "id": 33554157,
+          "dlc": 8,
+          "data": "ffffff5fffffff1f",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0140420f009728000808ff01002e5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "40420f0097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_1000000",
+      "tx": "aaaad0feff0140420f000000000004ff0100635555",
+      "rx": "aaaad0feff0140420f000000000004ff0101645555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "40420f00",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0140420f009728000808ff01002e5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "40420f0097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=1000000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=1000000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_800000",
+      "tx": "aaaad0feff0100350c000000000004ff0100135555",
+      "rx": "aaaad0feff0100350c000000000004ff0101145555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "00350c00",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0100350c009728000808ff0100de5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "00350c0097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=800000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=800000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=800000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_500000",
+      "tx": "aaaad0feff0120a107000000000004ff01009a5555",
+      "rx": "aaaad0feff0120a107000000000004ff01019b5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "20a10700",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0120a107009728000808ff0100655555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "20a1070097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=500000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=500000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=500000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_400000",
+      "tx": "aaaad0feff01801a06000000000004ff0100725555",
+      "rx": "aaaad0feff01801a06000000000004ff0101735555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "801a0600",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff01801a06009728000808ff01003d5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "801a060097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=400000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=400000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=400000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_250000",
+      "tx": "aaaad0feff0190d003000000000004ff0100355555",
+      "rx": "aaaad0feff0190d003000000000004ff0101365555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "90d00300",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0190d003009728000808ff0100005555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "90d0030097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=250000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=250000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=250000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_125000",
+      "tx": "aaaad0feff0148e801000000000004ff0100035555",
+      "rx": "aaaad0feff0148e801000000000004ff0101045555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "48e80100",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0148e801009728000808ff0100ce5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "48e8010097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=125000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=125000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=125000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_100000",
+      "tx": "aaaad0feff01a08601000000000004ff0100f95555",
+      "rx": "aaaad0feff01a08601000000000004ff0101fa5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "a0860100",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff01a08601009728000808ff0100c45555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "a086010097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=100000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=100000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=100000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_50000",
+      "tx": "aaaad0feff0150c300000000000004ff0100e55555",
+      "rx": "aaaad0feff0150c300000000000004ff0101e65555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "50c30000",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0150c300009728000808ff0100b05555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "50c3000097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    },
+    {
+      "name": "info bitrate=50000 tx=0x0 standard",
+      "tx": "aaaa000000000300000101000000080000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x0 standard",
+      "tx": "aaaa000000000701000000000000030000000b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x1 standard",
+      "tx": "aaaa010000000300000101000000080000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x1 standard",
+      "tx": "aaaa010000000701000000000000030000000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x2 standard",
+      "tx": "aaaa020000000300000101000000080000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x2 standard",
+      "tx": "aaaa020000000701000000000000030000000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x3 standard",
+      "tx": "aaaa03000000030000010100000008000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x3 standard",
+      "tx": "aaaa030000000701000000000000030000000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x4 standard",
+      "tx": "aaaa04000000030000010100000008000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x4 standard",
+      "tx": "aaaa040000000701000000000000030000000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x5 standard",
+      "tx": "aaaa05000000030000010100000008000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x5 standard",
+      "tx": "aaaa05000000070100000000000003000000105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x6 standard",
+      "tx": "aaaa06000000030000010100000008000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x6 standard",
+      "tx": "aaaa06000000070100000000000003000000115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x7 standard",
+      "tx": "aaaa07000000030000010100000008000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x7 standard",
+      "tx": "aaaa07000000070100000000000003000000125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x8 standard",
+      "tx": "aaaa08000000030000010100000008000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x8 standard",
+      "tx": "aaaa08000000070100000000000003000000135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x9 standard",
+      "tx": "aaaa09000000030000010100000008000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x9 standard",
+      "tx": "aaaa09000000070100000000000003000000145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xa standard",
+      "tx": "aaaa0a000000030000010100000008000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xa standard",
+      "tx": "aaaa0a000000070100000000000003000000155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xb standard",
+      "tx": "aaaa0b000000030000010100000008000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xb standard",
+      "tx": "aaaa0b000000070100000000000003000000165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xc standard",
+      "tx": "aaaa0c000000030000010100000008000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xc standard",
+      "tx": "aaaa0c000000070100000000000003000000175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xd standard",
+      "tx": "aaaa0d0000000300000101000000080000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xd standard",
+      "tx": "aaaa0d000000070100000000000003000000185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xe standard",
+      "tx": "aaaa0e0000000300000101000000080000001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xe standard",
+      "tx": "aaaa0e000000070100000000000003000000195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xf standard",
+      "tx": "aaaa0f0000000300000101000000080000001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xf standard",
+      "tx": "aaaa0f0000000701000000000000030000001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x0 extended",
+      "tx": "aaaa000000000300000101000000080001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x0 extended",
+      "tx": "aaaa000000000701000000000000030001000c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x1 extended",
+      "tx": "aaaa010000000300000101000000080001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x1 extended",
+      "tx": "aaaa010000000701000000000000030001000d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x2 extended",
+      "tx": "aaaa02000000030000010100000008000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x2 extended",
+      "tx": "aaaa020000000701000000000000030001000e5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x3 extended",
+      "tx": "aaaa03000000030000010100000008000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x3 extended",
+      "tx": "aaaa030000000701000000000000030001000f5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x4 extended",
+      "tx": "aaaa04000000030000010100000008000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x4 extended",
+      "tx": "aaaa04000000070100000000000003000100105555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x5 extended",
+      "tx": "aaaa05000000030000010100000008000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x5 extended",
+      "tx": "aaaa05000000070100000000000003000100115555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x6 extended",
+      "tx": "aaaa06000000030000010100000008000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x6 extended",
+      "tx": "aaaa06000000070100000000000003000100125555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x7 extended",
+      "tx": "aaaa07000000030000010100000008000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x7 extended",
+      "tx": "aaaa07000000070100000000000003000100135555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x8 extended",
+      "tx": "aaaa08000000030000010100000008000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x8 extended",
+      "tx": "aaaa08000000070100000000000003000100145555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0x9 extended",
+      "tx": "aaaa09000000030000010100000008000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0x9 extended",
+      "tx": "aaaa09000000070100000000000003000100155555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xa extended",
+      "tx": "aaaa0a000000030000010100000008000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xa extended",
+      "tx": "aaaa0a000000070100000000000003000100165555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xb extended",
+      "tx": "aaaa0b000000030000010100000008000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xb extended",
+      "tx": "aaaa0b000000070100000000000003000100175555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xc extended",
+      "tx": "aaaa0c0000000300000101000000080001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xc extended",
+      "tx": "aaaa0c000000070100000000000003000100185555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xd extended",
+      "tx": "aaaa0d0000000300000101000000080001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xd extended",
+      "tx": "aaaa0d000000070100000000000003000100195555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xe extended",
+      "tx": "aaaa0e0000000300000101000000080001001c5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xe extended",
+      "tx": "aaaa0e0000000701000000000000030001001a5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "info bitrate=50000 tx=0xf extended",
+      "tx": "aaaa0f0000000300000101000000080001001d5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "force bitrate=50000 tx=0xf extended",
+      "tx": "aaaa0f0000000701000000000000030001001b5555",
+      "rx": "",
+      "frames": []
+    },
+    {
+      "name": "SET_ADAPTER_BITRATE_1000000",
+      "tx": "aaaad0feff0140420f000000000004ff0100635555",
+      "rx": "aaaad0feff0140420f000000000004ff0101645555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 4,
+          "data": "40420f00",
+          "channel": 255,
+          "extended": true,
+          "remote": true
+        }
+      ]
+    },
+    {
+      "name": "verify_can_bitrate",
+      "tx": "aaaad0feff01000000000000000004ff0101d35555",
+      "rx": "aaaad0feff0140420f009728000808ff01002e5555",
+      "frames": [
+        {
+          "id": 33554128,
+          "dlc": 8,
+          "data": "40420f0097280008",
+          "channel": 255,
+          "extended": true,
+          "remote": false
+        }
+      ]
+    }
+  ],
+  "restored_bitrate": 1000000
+}

@@ -1,0 +1,55 @@
+# AR5 + OmniPicker + 两台 Orbbec 的部署配置，deploy_ar5.py 用。
+# 结构和上游 inference_utils/config.yaml 一样：deploy_ar5.py 先读上游那份，再用这份覆盖。上游那份不改。
+# 相机的设备地址、臂的限速 / 限幅 / 地板等，都用 atom_robot 的默认值（和采集同一套），这里只写不一样的。
+
+# 训练出来的控制器（相对仓库根目录）
+checkpoint: weights/epoch_0124-train_loss_0.001.ckpt
+
+robot:
+  # AR5 软限位，和训练数据 zarr 属性里的 joint_min / joint_max 一致（算法/DexGraspVLA-/SO101/数据转换说明.md C 节）。
+  # 动作按它还原成弧度；用错了关节角就全错。
+  dof_limits:
+    lower: [-3.1067, -2.0944, -3.1067, -1.0472, -3.1067, -0.8727, -0.8727]
+    upper: [3.1067, 2.0944, 3.1067, 2.5307, 3.1067, 0.8727, 0.8727]
+  arms:
+    right:
+      # 起始位姿：black_sleeve 50 条第 0 帧的关节角（50 条完全相同），即采集时的「映射中心」
+      init_qpos: [-0.5272, 0.0554, 0.1218, 1.5711, -1.6268, 0.1083, 0.0125]
+      # 上游抓完先到放置位松手、经过中间位再回起始位。我们没有放置位：null = 不去、不松手，直接回起始位
+      placement_joint: null
+      return_medium_joint: null
+
+arm:
+  # 部署专用的台面地板（m，基座系；只在 deploy_ar5.py 里覆盖，采集照旧用 atom_robot 默认的 0.10）。
+  # step_joints 检查「DH 链末端和腕部关节里最低的那个点」，低于它就原地保持、不往下走。
+  # 0.10 是按因时手算的，换 OmniPicker 后没重算；black_sleeve 50 条示范里这个点最低只到 0.202 m
+  # （中位 0.220，10-22 用 ar5_dh.json 的标定 DH 算的），0.10 要再往下 10 cm 才拦，等于没有保护。
+  # 取示范最低点再往下 2 cm。null = 用 atom_robot 的默认值。**模拟臂没有运动学，模拟模式下这道闸不生效**
+  joint_floor_z: 0.18
+
+gripper:
+  # 夹持力和速度要和训练数据采集时一致（看那个数据集的 dataset.json）：
+  # black_sleeve 是 64 / 176；black_box 是 64 / 128（10-26 跑 black_box 时改成 128，跑 black_sleeve 前改回 176）
+  grip_force: 64
+  speed: 176
+  # 往合拢方向多给的余量（README「部署：夹爪那一维要换算」）。下面三个都**待 omnipicker.jog 实测后再定**
+  close_margin: 0.1     # 约 10 mm
+  close_threshold: 0.02 # 模型输出比实测开合小这么多才算「要合拢」，免得全开时的读数抖动让夹爪自己合一点
+  hold_band: 0.05       # 正夹着时，模型输出比实测略大（这么多以内）也不松
+
+cameras:
+  head: cam_high        # 俯视 Gemini 335 → rgbm（atom_robot config 里 cameras.sources 的名字）
+  wrist: cam_front      # 腕部 Gemini 305 → right_cam_img
+
+control:
+  publish_hz: 50              # 发关节目标的频率 = 采集回路的 control_hz；step_joints 的每步限幅是按它定的
+  interpolation_period: 0.01  # 上游每 10 ms 一个样条点、20 个点（interpolation_num）走到新目标；按时间取点保持这个节奏
+  move_speed: 0.3             # 回起始位等整段移动的速度，rad/s（上游这里没有限速，靠他们的臂自己限）
+  monitor:
+    max_episode_duration: 100 # 上游的值，秒
+
+logging:
+  exp_name: ar5_black_sleeve  # 输出在仓库根目录 logs/<exp_name>/<时间>/（上游的位置，不进 git）
+
+sam:
+  checkpoint: weights/sam_vit_h_4b8939.pth

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-29",
+  "board_frame_origin_mm": [
+    311.53238051370937,
+    -265.0083869663784,
+    77.77325764583766
+  ],
+  "board_geometric_center_mm": [
+    331.38069458256257,
+    -406.12396996676335,
+    79.9952668070963
+  ],
+  "top": {
+    "verdict": "PASS",
+    "path": "V4L2 color + V4L2 Z16 depth + factory depth_to_color + top_extrinsic.json",
+    "note": "OBSENSOR 当前不出彩色（污染），改走 V4L2；335 的 d2c 平移约 14mm，必须用",
+    "n_points": 3632,
+    "dz_median_mm": -1.237788469242565,
+    "dz_iqr_mm": [
+      -2.4236196066273887,
+      0.019591729710763395
+    ],
+    "xy_to_board_geo_center_median_mm": 54.91669360734707,
+    "plane_tilt_from_vertical_deg": 0.6832190041879851,
+    "corner_depth_check": "期望 600mm，实测 605mm，比值 1.005",
+    "color_pnp_vs_calib_board_mm": [
+      1.1,
+      -0.5,
+      -3.7
+    ]
+  },
+  "wrist": {
+    "verdict": "COLOR_OK_DEPTH_BAD",
+    "path": "V4L2 color + V4L2 Z16×0.1 + factory d2c(≈I) + wrist_handeye × FK",
+    "color_pnp_vs_calib_board_mm": [
+      0.9,
+      -0.8,
+      -0.6
+    ],
+    "color_note": "彩色→基座（手眼+FK）正确，板中心差 <1mm",
+    "depth_note": "角点处深度实测 304mm vs PnP 期望 363mm（短 59mm，比值 0.833）；不能直接用当前深度做基座系三维",
+    "corner_depth_check": "期望 363mm，实测 304mm，比值 0.833"
+  }
+}
