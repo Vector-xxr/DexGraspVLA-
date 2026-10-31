@@ -674,6 +674,54 @@ class CollectConfig:
     # 一批数据里别混着用。
     space: str = "joint"
 
+    # 只在 space="cartesian" 下有用（2026-10-31 加）。详见 cartesian_mapping.py 顶部。
+    #   cart_ik   "dls" = 原来的逆解（默认，不变）；"weighted" = 照 SO101-OpenArm_teleop 移植的
+    #   tcp_z     受控点沿法兰 z 偏多少米。None = dls 下 0（原来的行为）、weighted 下 0.13
+    #             （OmniPicker + 转接板到指尖，用户 10-31 量的）
+    #   ori_cost  weighted 的姿态权重，None = 0.15（位置是 50）。姿态跟得不够就往大调
+    #   rot_scale 主臂手腕转多少、从臂转多少倍。None = dls 下 1（原来的行为）、weighted 下
+    #             跟 scale 一样（10-31 用户真机：位置缩了一半、姿态还 1:1，「动一下就歪」）
+    #   cart_log  逐帧诊断记录写到 out_dir/cart_log/，按 R 丢掉的也留着
+    # cart_ik="sdk"（10-31 加，试验模式，只用来对比手感）：不在本地解逆解，发排队式 MoveL 让
+    # 控制器解（movel_stream.py）。臂整场不进实时模式，关节空间的保护（跳变门、限速、地板）不起作用，
+    # 只剩工作空间盒和控制器自己的软限位 / 碰撞检测。tcp_z、rot_scale 的默认和 weighted 一样。
+    #   sdk_speed  MoveL 速度 mm/s。设定速度决定加速度档（<500 是低档），单段实测给 600
+    #   sdk_zone   转弯区。是分档百分比不是毫米：<1 每点停车、1~20 → 10%、>60 → 100%
+    #   sdk_elbow  臂角怎么给：current 每段刷新 / start 开始时取一次 / none 不给（可能被控制器丢指令）
+    cart_ik: str = "dls"
+    tcp_z: Optional[float] = None
+    ori_cost: Optional[float] = None
+    rot_scale: Optional[float] = None
+    cart_log: bool = False
+    sdk_speed: float = 600.0
+    sdk_zone: float = 100.0
+    sdk_elbow: str = "current"
+    # 10-31 真机第一次：死区 1 mm / 0.5° 时碎段把队列堵到延迟 1.9 s。死区改成 3 mm / 2°，
+    # 再加积压闸门：估算队列里没走完的超过 sdk_backlog_ms 就先不发
+    sdk_deadband_mm: float = 3.0
+    sdk_rot_deadband_deg: float = 2.0
+    sdk_backlog_ms: float = 150.0
+    # 一次 moveAppend 发几个点（10-31 用户要 10 个：希望控制器把多段当一段走、不每段都加减速）。
+    # 1 = 逐条发 + 上面的积压闸门；>1 = 攒满一批一起发，按臂实测走到第几个点续发
+    sdk_batch: int = 10
+    # 批量发之前在本地把接近共线的点合掉（偏离首尾连线 < 这么多毫米、姿态偏离 < 2°）。
+    # 10-31 真机：批内 10 个点控制器照样每个 ~64 ms，耗时跟点数走。0 = 不合
+    sdk_merge_mm: float = 2.0
+
+    def cartesian_tcp_z(self) -> float:
+        if self.tcp_z is not None:
+            return self.tcp_z
+        return 0.13 if self.cart_ik in ("weighted", "sdk") else 0.0
+
+    def cartesian_rot_scale(self) -> float:
+        if self.rot_scale is not None:
+            return self.rot_scale
+        return self.scale if self.cart_ik in ("weighted", "sdk") else 1.0
+
+    def sdk_mode(self) -> bool:
+        """臂走排队式 MoveL、整场不进实时模式。"""
+        return self.space == "cartesian" and self.cart_ik == "sdk"
+
     # 在上面那些比例之上再乘一个系数。0.5 = 幅度减半。
     # cartesian 下它就是位置缩放：主臂末端走 1 cm，从臂走 scale cm。
     #
@@ -746,6 +794,22 @@ class CollectConfig:
             raise ValueError("task 不能是空的 —— 它会写进每个 .npz，训练时要用")
         if self.scale <= 0:
             raise ValueError(f"scale 必须是正数，给的是 {self.scale}")
+        if self.cart_ik not in ("dls", "weighted", "sdk"):
+            raise ValueError(f"cart_ik 只能是 dls、weighted 或 sdk，给的是 {self.cart_ik!r}")
+        if self.sdk_elbow not in ("current", "start", "none"):
+            raise ValueError(f"sdk_elbow 只能是 current、start 或 none，给的是 {self.sdk_elbow!r}")
+        if not (self.sdk_speed > 0 and self.sdk_zone >= 0):
+            raise ValueError(f"sdk_speed 要是正数、sdk_zone 不能是负数：{self.sdk_speed} / {self.sdk_zone}")
+        if self.sdk_deadband_mm < 0 or self.sdk_rot_deadband_deg < 0 or self.sdk_backlog_ms <= 0:
+            raise ValueError("sdk 死区不能是负数、sdk_backlog_ms 要是正数")
+        if not 1 <= int(self.sdk_batch) <= 50:
+            raise ValueError(f"sdk_batch 要在 1~50，给的是 {self.sdk_batch}")
+        if self.sdk_merge_mm < 0:
+            raise ValueError(f"sdk_merge_mm 不能是负数，给的是 {self.sdk_merge_mm}")
+        if self.ori_cost is not None and self.ori_cost < 0:
+            raise ValueError(f"ori_cost 不能是负数，给的是 {self.ori_cost}")
+        if self.rot_scale is not None and self.rot_scale < 0:
+            raise ValueError(f"rot_scale 不能是负数，给的是 {self.rot_scale}")
         if self.min_frames < 1:
             raise ValueError(f"min_frames 至少是 1，给的是 {self.min_frames}")
         for name in ("filter_min_cutoff", "filter_beta"):

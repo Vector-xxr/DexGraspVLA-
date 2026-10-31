@@ -54,7 +54,15 @@ class OmniPickerConfig:
     #   目标 230：速度 128 就冲到 241（+11）
     #   目标 240：速度 176 冲过 255 回绕（采集时真出过一次）
     # 原来是 240（只看了从空位张开不冲）。要放宽先按同样的办法测，别只改数字。
+    #
+    # **10-30 起 open_max 只当开度的换算基准**（开度 = 位置 / 210），数据和部署都按它换算，不能再改；
+    # 张开目标另由 open_limit 封顶。
     open_max: int = 210
+    # 张开目标的上限 180（约 85 mm）。10-30 采集时目标 210 又出事两次：力 64、速度 128 从夹紧松开
+    # 冲到 219、在 206~218 来回晃；采集中两次卡在张开端（213、209）报堵转、不响应合拢，断电才好。
+    # 同日力 112、速度 160 从夹紧松开到 178：停在 177，不冲不晃。
+    # 全张开在数据里记成 180/210 ≈ 0.86，不是 1。
+    open_limit: int = 180
     deadband: int = 2                   # 目标变化小于这个就不重发，约 1 mm
 
     # 「移动中」但位置不动、离目标还远，持续这么久判卡死（航凯夹爪 9-30 的教训）
@@ -62,7 +70,7 @@ class OmniPickerConfig:
 
     def __post_init__(self):
         for name in ("grip_force", "grip_force_min", "grip_force_max", "open_force",
-                     "speed", "acc", "dec", "open_max"):
+                     "speed", "acc", "dec", "open_max", "open_limit"):
             if not 1 <= int(getattr(self, name)) <= 255:
                 raise ValueError(f"OmniPicker {name} 必须是 1..255")
         if not 1 <= self.addr <= 247:
@@ -71,6 +79,9 @@ class OmniPickerConfig:
             raise ValueError("open_force 不能低于 64：张开方向力小了会冲过头回绕，见注释")
         if self.open_max > 210:
             raise ValueError("open_max 不能超过 210：从夹紧状态松开、目标靠近张开端会冲过 255 回绕，见注释")
+        if self.open_limit > self.open_max:
+            raise ValueError(f"open_limit {self.open_limit} 不能超过 open_max {self.open_max}："
+                             "目标靠近张开端会冲过头、卡在张开端，见注释")
         if not self.grip_force_min <= self.grip_force <= self.grip_force_max:
             raise ValueError(f"grip_force {self.grip_force} 不在 "
                              f"[{self.grip_force_min}, {self.grip_force_max}]")

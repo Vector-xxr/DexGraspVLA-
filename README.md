@@ -7,7 +7,7 @@
 > [!NOTE]
 > **放在 GitHub 上要知道的**
 > - 模型权重（`weights/`）、数据集和训练输出（`data/`）、第三方库 Cutie（`third_party/`）都不在仓库里，下载和安装见 [`环境说明.md`](环境说明.md) 第 5 节和 [`requirements-5070ti.txt`](requirements-5070ti.txt)。
-> - 自己采的数据怎么转成训练用的 zarr（采集、标框、SAM + Cutie 生成掩码、打包）不在本仓库：转换器在 [VisionPro_teleop_DexterousHand](https://github.com/Vector-xxr/VisionPro_teleop_DexterousHand) 的 `VR设备/to_dexgraspvla.py`，流程说明和打包脚本在原工作区的 `算法/DexGraspVLA-/SO101/`（没有公开）。这里只写训练要的数据格式，见下文「数据格式」。
+> - 采集代码（AR5 + SO-101 主臂遥操、OmniPicker 夹爪驱动、两台 Orbbec 的彩色和深度、标定）10-30 起在本仓库的 [`SO101/`](SO101/)。转成训练用 zarr 的转换器（标框、SAM + Cutie 生成掩码、打包）还在 [VisionPro_teleop_DexterousHand](https://github.com/Vector-xxr/VisionPro_teleop_DexterousHand) 的 `VR设备/to_dexgraspvla.py`，流程见 [`SO101/数据转换说明.md`](SO101/数据转换说明.md)。训练要的数据格式见下文「数据格式」。
 > - 文中指向 `../../工作区说明.md`、`../../数据_硬件/…` 的链接是原工作区里的其他项目，在这里打不开。
 > - 上游 DexGraspVLA 没有附许可证文件；出处、提交号和改动见 [`上游来源.md`](上游来源.md)。
 
@@ -36,6 +36,8 @@ DexGraspVLA-/
 ├── deploy_ar5.py  inference_utils/config_ar5.yaml            C4 部署：AR5 + OmniPicker + 两台 Orbbec（replay / mockcam / real 三种模式）
 ├── deploy_viewer.py                                          部署时的实时画面（俯视 + 掩码、腕部），独立进程，由 deploy_ar5.py 自动启动
 ├── 环境说明.md  上游来源.md  上游改动_DexGraspVLA.patch
+├── 3D输入方案.md                                              两路深度转基座系坐标加到 token 上的改进方案（网络还没改）
+├── SO101/       数据采集：AR5 遥操采集（atom_robot/）、OmniPicker 驱动（omnipicker/）、相机标定（calib_poses_manual/）
 ├── 规划器测试/   看参考图框出物体的测试脚本和结论（测试集、结果不进 git）
 ├── data/        不进 git：grasp_demo_example（官方小数据集）、outputs/（训练输出）
 ├── weights/     不进 git：官方控制器检查点、SAM、torch_home/（DINOv2 等）
@@ -103,12 +105,15 @@ bash train_5070ti.sh "policy.start_ckpt_path='$CK'" +training.start_ckpt_skip_mi
 
 夹住时的实测开合就是物体表面的位置（black_sleeve 是 0.38~0.41），所以模型学到的、推理时输出的也就是这个数。原样发的话，目标正好落在表面附近，加上模型输出每帧都有抖动，上面三种情况来回切，夹不稳。
 
-**换算**（模型输出、当前实测开合都是 0~1，0 = 合拢、1 = 全开；0~1 对应位置 0~210，全开约 99 mm）：
+**换算**（模型输出、当前实测开合都是 0~1，0 = 合拢；0~1 按位置 0~210 换算）：
 
 | 模型输出比当前实测开合 | 发给夹爪的目标 | 力上限 |
 |---|---|---|
 | 小（往合拢走） | 输出 − 余量，最小 0 | 这个数据集采集时测好的夹持力（`dataset.json` 的 `grip_force`，black_sleeve 是 64） |
-| 大（往张开走） | 输出原样，最大 1 | 同上（驱动张开时自己会保证不低于 64） |
+| 大（往张开走） | 输出原样，最大 1；驱动再把位置封顶到 180（开度约 0.86） | 同上（驱动张开时自己会保证不低于 64） |
+
+> [!NOTE]
+> **张开上限 10-30 从 210 降到 180**（约 85 mm）：210 在采集中冲过头、两次卡在张开端，见 [`SO101/omnipicker/README.md`](SO101/omnipicker/README.md)。开度仍按 210 换算，所以 10-30 起采的数据全开记成 0.86，之前的（如 black_sleeve）记成 1。两批混训时，张开状态的数值不一样。
 
 这样模型说「去 0.40」时实际发的是 0.30，夹爪在 0.40 被物体挡住、按夹持力夹着；空中合拢时只是比模型提前一点，没有影响。
 
@@ -223,7 +228,10 @@ C1 离线回放（10-22）实测：j3、j5 的预测和真值差中位 0.15°，
 | 10-28 | 测本地模型 Xiaomi-Lens-0 能不能按文字认出黑色套筒、直接出掩码（想替代「规划器给框 → SAM」或离线自动标框）：描述写全时训练数据第一帧 50/50、腕部 8/8；被夹爪挡住时基本认不出，而且不会说找不到；每张 0.77 秒、显存 9 GB，只适合开局用一次或离线标框（[`规划器测试/README.md`](规划器测试/README.md) 文末「补测」） |
 | 10-22 | 用 black_sleeve 在 H100 8 卡训完：从官方检查点部分加载，125 轮（配置默认值，不是论文的 84），共 5,874 步，最后 train_loss 0.001。检查点 `weights/epoch_0124-train_loss_0.001.ckpt`（不进 git）。C1 离线回放做完（新脚本 [`offline_replay.py`](offline_replay.py)，结果见 [`待测试.md`](待测试.md) C1）；为了直接调用 `inference.py`，环境补装了上游钉的 `openai==1.63.2`、`json_repair==0.36.1`。C2/C3 也做完（[`realtime_sim.py`](realtime_sim.py)）：三样常驻 8.6 GB，每秒执行 15 步（采集的一半），遮挡后的掩码跟踪有问题（「已知问题」第 1、4 条）。还没上真机 |
 
-还没做的：完整训练、看收敛效果（包括掩码空帧有没有影响）；推理链路（规划器已选定 qwen3-vl-plus，还没接进 `inference.py`，见 [`待测试.md`](待测试.md) C6）和真机测试；推理硬件层，含夹爪余量换算（见上文）；13 维（灵巧手）数据；8 卡训练。
+| 10-30 | SO101 采集代码并进本仓库。`collect.py --depth` 两路深度跟彩色逐帧对齐一起存（[`SO101/数据集格式说明.md`](SO101/数据集格式说明.md) 4.7 节）。定了 3D 输入方案并用 2 条带深度的试采验证（[`3D输入方案.md`](3D输入方案.md)）。OmniPicker 张开目标 210 又冲过头卡死两次，封顶 180 |
+| 10-31 | 笛卡尔遥操加两种逆解：`--ik weighted`（本地解、位置为主、姿态放软，真机手感比原来的 `dls` 好）和 `--ik sdk`（控制器解、排队式 MoveL，新文件 `SO101/atom_robot/ar5/movel_stream.py`；**试验模式**，录的数据带 `teleop=cartesian_sdk_trial`，别混进正式数据集），参数见 [`SO101/数据采集.md`](SO101/数据采集.md)。腕部 305 深度对齐彩色修正：实测对齐后固定偏左上 3~4 像素、不随距离变，改了深度内参主点（`cx` +3.0、`cy` +2.5），出厂的零平移不动，改后残差 1~2 像素 |
+
+还没做的：完整训练、看收敛效果（包括掩码空帧有没有影响）；推理链路（规划器已选定 qwen3-vl-plus，还没接进 `inference.py`，见 [`待测试.md`](待测试.md) C6）和真机测试；推理硬件层，含夹爪余量换算（见上文）；3D 输入的标签生成和网络改动；13 维（灵巧手）数据；8 卡训练。
 
 ## 离线测试
 
@@ -245,5 +253,8 @@ bash train_5070ti.sh training.debug=True
 | [`上游改动_DexGraspVLA.patch`](上游改动_DexGraspVLA.patch) | 对上游 2 个文件的改动全文 |
 | [`requirements-5070ti.txt`](requirements-5070ti.txt) | `dexgraspvla` 环境的确切版本，以及偏离上游的原因 |
 | [`README_DexGraspVLA.md`](README_DexGraspVLA.md) | 上游的说明 |
+| [`SO101/数据采集.md`](SO101/数据采集.md) | 遥操采集：环境、主臂、夹爪键位、相机、`collect.py` 全部参数 |
+| [`SO101/数据集格式说明.md`](SO101/数据集格式说明.md) | 采集出来的 npz / mp4 / 深度 zarr 里每个字段的含义 |
 | [`SO101/数据转换说明.md`](SO101/数据转换说明.md) | 自己的采集数据 → zarr 的全过程 |
+| [`SO101/omnipicker/README.md`](SO101/omnipicker/README.md) | OmniPicker 夹爪驱动、485 接线、踩过的坑（张开上限等） |
 | [`../../工作区说明.md`](../../工作区说明.md)（原工作区） | 整个工作区：结构、约定、迁移 |

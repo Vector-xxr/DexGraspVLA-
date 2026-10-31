@@ -564,6 +564,11 @@ class Recorder:
             # OmniPicker 暂停的位置和时长**故意不进 npz**：用户 10-20 要求数据集里完全看不出
             # 采集时的中断。暂停那段已从 timestamp 里扣掉，停了几次、几秒只打在终端 / collect.log。
         )
+        sdk_mode = getattr(self.config, "sdk_mode", None)
+        if callable(sdk_mode) and sdk_mode():
+            # --ik sdk 是试验模式（10-31 用户定：只用来对比手感）。只在这个模式下加这一项，
+            # 别的模式的 npz 格式一点不变；转换 / 训练时看到它就别混进数据集
+            payload["teleop"] = "cartesian_sdk_trial"
         return payload, self.frames
 
     def _write(self, npz_path: Path, payload: dict, frames: dict) -> None:
@@ -1092,8 +1097,10 @@ class TrackingWatch:
     只是从来没人看。这个类每秒比一次，涨了就打一行，并说出是哪个关节。
     """
 
-    def __init__(self, mapper, arm, joint_lo, joint_hi, period=1.0, env=None):
+    def __init__(self, mapper, arm, joint_lo, joint_hi, period=1.0, env=None, streamer=None):
         self.mapper, self.arm, self.env = mapper, arm, env
+        # --ik sdk 的 MoveL 流：臂停下的原因换成了「执行失败 / 启动被拒」和「队列走空」
+        self.streamer = streamer
         self.lo, self.hi = np.asarray(joint_lo), np.asarray(joint_hi)
         self.period = period
         self.floor_z = getattr(getattr(env, "config", None), "arm", None)
@@ -1112,7 +1119,10 @@ class TrackingWatch:
         # 目标低于地板时 step_joints **把 goal 换成原地保持**，臂停死而回路照常跑，
         # 症状就是「主臂怎么动从臂都不动」，屏幕上一个字都没有。
         env = dict(getattr(self.env, "stats", {}) or {})
-        return {"ik_fail": stats.get("ik_fail", 0),
+        movel = dict(getattr(self.streamer, "stats", {}) or {})
+        return {"movel_err": movel.get("execution_errors", 0) + movel.get("start_failed", 0),
+                "movel_restart": movel.get("restarts", 0),
+                "ik_fail": stats.get("ik_fail", 0), "ik_lag": stats.get("ik_lag", 0),
                 "clamped": stats.get("clamped", 0), "missing": stats.get("missing", 0),
                 "jump": rejected.get("jump", 0), "limits": rejected.get("limits", 0),
                 "floor": env.get("floor_blocked", 0),
@@ -1131,9 +1141,20 @@ class TrackingWatch:
         if not grew:
             return None
         parts = []
+        if "movel_err" in grew:
+            parts.append(f"**MoveL 失败 {grew['movel_err']} 次**（执行失败或启动被拒，多半是目标超出范围 50002）"
+                         "—— 臂停在那儿，主臂往回收一点、臂停稳后自动接着跟")
+        # 每次重启 = 队列走空、臂停下再起步（约 170 ms），就是「钝一下」。偶尔一次正常，一秒好几次才说
+        if grew.get("movel_restart", 0) >= max(2, int(self.period * 2)):
+            parts.append(f"MoveL 队列走空重启 {grew['movel_restart']} 次（手比臂慢时臂停下再起步，会一顿一顿）")
         if "ik_fail" in grew:
             parts.append(f"**目标够不到** {grew['ik_fail']} 帧（逆解不收敛）—— 臂停在上一个"
                          "够得到的位置。多半是主臂把末端带出了臂的可达范围，往回收一点就恢复")
+        if "ik_lag" in grew:
+            # --ik weighted 才会有：它不会解不出，只会离目标有距离
+            worst = self.mapper.stats.get("ik_lag_max_mm", 0.0)
+            parts.append(f"末端离目标超过 5 mm {grew['ik_lag']} 帧（至今最大 {worst:.0f} mm）—— "
+                         "目标出了可达范围或关节速度到顶，臂贴着能到的地方走")
         if "jump" in grew:
             parts.append(f"跳变被拒 {grew['jump']} 次 —— **这个会雪崩**，"
                          "把主臂慢慢搬回刚才的位置就能恢复")
@@ -1321,6 +1342,20 @@ def print_config(config, out_dir: Path, episode: int = None) -> None:
 
     print(f"  遥操空间  " + ("**笛卡尔**：主臂末端位姿 -> 逆解，7 个轴全动" if cfg.space == "cartesian"
                              else "关节：一对一映射，轴3、轴5 锁死"))
+    if cfg.space == "cartesian":
+        print(f"  逆解      {cfg.cart_ik}   受控点沿法兰 z 偏 {cfg.cartesian_tcp_z() * 1000:.0f} mm   "
+              f"转动 x{cfg.cartesian_rot_scale():g}"
+              + (f"   姿态权重 {cfg.ori_cost if cfg.ori_cost is not None else 0.15:g}（位置 50）"
+                 if cfg.cart_ik == "weighted" else "")
+              + ("   逐帧诊断记录 开" if cfg.cart_log else ""))
+        if cfg.cart_ik == "sdk":
+            print(f"            MoveL 速度 {cfg.sdk_speed:g} mm/s   转弯区 {cfg.sdk_zone:g}   臂角 {cfg.sdk_elbow}   "
+                  f"死区 {cfg.sdk_deadband_mm:g} mm / {cfg.sdk_rot_deadband_deg:g}°   "
+                  + ((f"一次发 {cfg.sdk_batch} 个点，共线合并 {cfg.sdk_merge_mm:g} mm（只剩最后一段再续发）\n"
+                      if cfg.sdk_merge_mm > 0 else
+                      f"一次发 {cfg.sdk_batch} 个点（队列剩不到 3 个再续发）\n") if cfg.sdk_batch > 1
+                     else f"逐条发，积压上限 {cfg.sdk_backlog_ms:g} ms\n")
+                  + "              ⚠ 试验模式：控制器解逆解，只用来对比手感，录的数据标成 cartesian_sdk_trial")
     print(f"  映射      {'相对' if cfg.relative else '绝对'}   幅度 x{cfg.scale}   "
           f"接合过渡 {cfg.ramp_seconds:.1f}s")
     cut = cfg.filter_min_cutoff
@@ -1385,6 +1420,38 @@ def main() -> int:
                         help="幅度系数，0.5 = 减半")
     parser.add_argument("--space", choices=("joint", "cartesian"), default=None,
                         help="joint = 关节一对一（轴3、轴5 锁死）；cartesian = 主臂末端位姿 -> 逆解，7 个轴全动")
+    parser.add_argument("--ik", dest="cart_ik", choices=("dls", "weighted", "sdk"), default=None,
+                        help="只在 --space cartesian 下有用。dls = 原来的逆解（默认）；weighted = 照 "
+                             "SO101-OpenArm_teleop 移植的：位置为主、姿态放软、够不到时贴着边界走不卡死；"
+                             "sdk = 不在本地解，发排队式 MoveL 让控制器解（试验模式，只用来对比手感）")
+    parser.add_argument("--sdk-speed", type=float, default=None, metavar="MM/S",
+                        help="--ik sdk 的 MoveL 速度，默认 600（<500 会落进低加速度档）")
+    parser.add_argument("--sdk-zone", type=float, default=None,
+                        help="--ik sdk 的转弯区，分档百分比不是毫米，默认 100（<1 每点停车）")
+    parser.add_argument("--sdk-elbow", choices=("current", "start", "none"), default=None,
+                        help="--ik sdk 的臂角：current 每段刷新（默认）/ start 开始时取一次 / "
+                             "none 不给、让控制器自己选解（可能被控制器悄悄丢指令）")
+    parser.add_argument("--sdk-deadband", type=float, default=None, metavar="MM",
+                        help="--ik sdk 的位置死区，默认 3 mm。太小会发出一堆碎段把队列堵住")
+    parser.add_argument("--sdk-rot-deadband", type=float, default=None, metavar="度",
+                        help="--ik sdk 的姿态死区，默认 2°")
+    parser.add_argument("--sdk-batch", type=int, default=None, metavar="N",
+                        help="--ik sdk 一次 moveAppend 发几个点，默认 10（攒满一批一起发，队列里剩不到 3 个点再续发）；"
+                             "1 = 逐条发、按 --sdk-backlog 估算积压")
+    parser.add_argument("--sdk-merge", type=float, default=None, metavar="MM",
+                        help="--ik sdk 批量发之前把接近共线的点合掉的容差，默认 2 mm（姿态 2°）；0 = 不合")
+    parser.add_argument("--sdk-backlog", type=float, default=None, metavar="MS",
+                        help="--ik sdk 估算队列里没走完的超过这么久就先不发，默认 150 ms。"
+                             "调大跟得更连贯但延迟更高，调小反之")
+    parser.add_argument("--tcp-z", type=float, default=None, metavar="米",
+                        help="笛卡尔下受控点沿法兰 z 往外偏多少米（转动绕这一点）。"
+                             "默认 dls 下 0、weighted 下 0.13（OmniPicker 指尖）")
+    parser.add_argument("--ori-cost", type=float, default=None,
+                        help="--ik weighted 的姿态权重，默认 0.15（位置 50）。姿态跟得不够就往大调")
+    parser.add_argument("--rot-scale", type=float, default=None,
+                        help="笛卡尔下主臂手腕转多少、从臂转多少倍。默认 dls 下 1、weighted 下跟 --scale 一样")
+    parser.add_argument("--cart-log", action="store_true", default=None,
+                        help="笛卡尔下逐帧记目标、逆解、残差到 {out}/cart_log/，按 R 丢掉的那条也留着。诊断用")
     parser.add_argument("--relative", action="store_true", default=None,
                         help="按主臂走的位移驱动（默认开）")
     parser.add_argument("--absolute", dest="relative", action="store_false",
@@ -1437,6 +1504,12 @@ def main() -> int:
     collect_cfg = defaults
     for flag, field_name in (("task", "task"), ("out", "out_dir"), ("hz", "hz"),
                              ("scale", "scale"), ("relative", "relative"), ("space", "space"),
+                             ("cart_ik", "cart_ik"), ("tcp_z", "tcp_z"), ("ori_cost", "ori_cost"),
+                             ("rot_scale", "rot_scale"), ("cart_log", "cart_log"),
+                             ("sdk_speed", "sdk_speed"), ("sdk_zone", "sdk_zone"),
+                             ("sdk_elbow", "sdk_elbow"), ("sdk_deadband", "sdk_deadband_mm"),
+                             ("sdk_rot_deadband", "sdk_rot_deadband_deg"), ("sdk_backlog", "sdk_backlog_ms"),
+                             ("sdk_batch", "sdk_batch"), ("sdk_merge", "sdk_merge_mm"),
                              ("calib_id", "calib_id"), ("leader_port", "leader_port"),
                              ("leader_baud", "leader_baud"),
                              ("min_cutoff", "filter_min_cutoff"), ("beta", "filter_beta"),
@@ -1467,7 +1540,9 @@ def main() -> int:
         if args.task is not None:
             print("  注意：OmniPicker 模式下语言 prompt 在终端里输入，--task 不用。")
     out_dir = Path(collect_cfg.out_dir).expanduser()
-    config.arm.use_realtime = True
+    # --ik sdk 整场走排队式 MoveL：实时流一开就占着臂，和 MoveL 抢（VR 那边踩过，拆 RT 要三步、
+    # 少一步 MoveL 全程静默无效）。干脆不开。
+    config.arm.use_realtime = not collect_cfg.sdk_mode()
     if args.no_cameras:
         config.cameras.sources = {}
     elif getattr(collect_cfg, "cameras", ""):
@@ -1545,9 +1620,15 @@ def main() -> int:
         # 接口和 JointMapper 一样，下面所有东西（P 键、回 0 位、限速、跳变门、
         # 地板检查、诊断、存盘）原样沿用。
         from atom_robot.ar5.cartesian_mapping import CartesianMapConfig, CartesianMapper  # noqa: PLC0415
+        cart_cfg = CartesianMapConfig(position_scale=collect_cfg.scale, ik=collect_cfg.cart_ik,
+                                      tcp_z=collect_cfg.cartesian_tcp_z(),
+                                      rotation_scale=collect_cfg.cartesian_rot_scale(),
+                                      log_dir=str(out_dir / "cart_log") if collect_cfg.cart_log else None)
+        if collect_cfg.ori_cost is not None:
+            cart_cfg.orientation_cost = collect_cfg.ori_cost
         mapper = CartesianMapper(
             config.arm, config.arm.workspace_min, config.arm.workspace_max,
-            config=CartesianMapConfig(position_scale=collect_cfg.scale),
+            config=cart_cfg,
             joint_cfg=JointMapConfig.load(**collect_cfg.mapping_overrides))
     else:
         mapper = JointMapper(JointMapConfig.load(**collect_cfg.mapping_overrides))
@@ -1611,7 +1692,26 @@ def main() -> int:
 
     env = AR5Env(config)
     env.connect()
-    if not getattr(env.arm, "_rt_active", False):
+    streamer = None
+    if collect_cfg.sdk_mode():
+        from atom_robot.ar5.movel_stream import MoveLStreamer  # noqa: PLC0415
+        print("\n  ⚠ --ik sdk：**试验模式，只用来对比手感**。臂走排队式 MoveL、控制器自己解逆解；"
+              "关节空间的保护（跳变门、限速、地板检查）不起作用，只剩工作空间盒 + 控制器的软限位 / 碰撞检测。")
+        if collect_cfg.sdk_elbow == "none":
+            print("  ⚠ --sdk-elbow none：不给臂角。驱动里记过，不带臂角时控制器可能解不出、"
+                  "**悄悄丢指令**（控制器日志 50002「目标点超出运动范围」）。臂不动就是这个")
+        streamer = MoveLStreamer(env.arm._robot, env.arm.sdk, speed=collect_cfg.sdk_speed,
+                                 zone=collect_cfg.sdk_zone, elbow=collect_cfg.sdk_elbow,
+                                 min_step_mm=collect_cfg.sdk_deadband_mm,
+                                 min_rotation_deg=collect_cfg.sdk_rot_deadband_deg,
+                                 backlog_ms=collect_cfg.sdk_backlog_ms, batch=collect_cfg.sdk_batch,
+                                 merge_mm=collect_cfg.sdk_merge_mm)
+        if not streamer.configure():
+            print("\n  排队模式没配起来，退出（臂没动过）。")
+            env.close()
+            leader.disconnect()
+            return 1
+    elif not getattr(env.arm, "_rt_active", False):
         print("\n  臂的实时通道还是没起来 —— 上面已经试过上电了。")
         print("    自己看一眼：python -m atom_robot.ar5.unseize")
         print("  SDK 在未上电时报的是「网络异常: 网络连接错误」或者「实时模式异常」，")
@@ -1774,7 +1874,7 @@ def main() -> int:
     watch = TrackingWatch(mapper, env.arm,
                           np.asarray(config.arm.joint_min) + config.arm.joint_limit_margin,
                           np.asarray(config.arm.joint_max) - config.arm.joint_limit_margin,
-                          env=env)
+                          env=env, streamer=streamer)
     print()
 
     engaged = False
@@ -1815,11 +1915,38 @@ def main() -> int:
             link.publish_status(min_interval=0, busy="go_home", recording=False,
                                 engaged=False, episode=schedule.index, samples=schedule.done)
         try:
+            if streamer is not None and not streamer.halt():
+                # 排队的 MoveL 还没走完时发 MoveAbsJ，moveStart 回 -20 被当成失败抛出来
+                print("  ⚠ MoveL 队列 8 秒内没停下，先不回位")
+                return
             ok = env.goto_joints(mapper.centre, timeout_s=20.0)
             print("  臂已回 0 位（映射中心 = 主臂全零对应的姿势）" if ok is not False else
                   "  ⚠ 臂没在 20s 内回到 0 位，自己看一眼再继续")
         except Exception as exc:                       # noqa: BLE001
             print(f"  ⚠ 回初始位置失败：{type(exc).__name__}: {exc}")
+
+    movel_warned = [0.0]
+
+    def step_arm(q_cmd, gripper=None, observe=False):
+        """给臂发这一拍。实时模式下就是 env.step_joints；--ik sdk 下改发映射器给的法兰目标
+        （排队式 MoveL），q_cmd 不用。夹爪、观测两条路一样。"""
+        if streamer is None:
+            return env.step_joints(q_cmd, gripper, observe=observe)
+        try:
+            # 松开 / P / 等夹爪时停追加；接合着但这一拍没目标（重锚后取主臂锚点那拍）什么都不做
+            streamer.step(mapper.engaged, getattr(mapper, "sdk_target", None),
+                          on_start=lambda: mapper.engage(hold_posture(env.arm, config.arm.num_joints)))
+        except RuntimeError as exc:
+            # 执行失败（多半是 50002 目标超出范围）或 moveStart 被拒：先停追加，下一拍空闲了再起步
+            streamer.pause()
+            now = time.monotonic()
+            if now - movel_warned[0] > 1.0:
+                movel_warned[0] = now
+                print(f"\n  ⚠ MoveL：{exc}")
+        if gripper is not None:
+            env.hand.set_opening(float(np.clip(gripper, 0.0, 1.0)))
+        env.stats["steps"] += 1
+        return env.get_observation(t=env.stats["steps"]) if observe else None
 
     def end_episode() -> bool:
         """存下当前这条，推进 schedule。返回是否该收工。"""
@@ -2036,7 +2163,7 @@ def main() -> int:
                     mapper.disengage()
                     engaged = False
                 closing = flow.gripper_command == 0.0
-                goal = round(flow.gripper_command * env.hand.config.open_max)
+                goal = env.hand.target_position(flow.gripper_command)
                 grip_wait = GripWait(time.perf_counter(), goal, closing)
                 print("\n  臂冻住，" + ("等夹爪夹牢" if closing else "等夹爪张开到位") + "再接着跟")
             elif action == "grip_close":
@@ -2295,8 +2422,9 @@ def main() -> int:
 
                 joints = leader.read_positions()
                 if len(joints) < len(SO_JOINTS):
-                    env.step_joints(hold_posture(env.arm, config.arm.num_joints),
-                                    observe=False)
+                    if streamer is not None:
+                        mapper.sdk_target = None        # 主臂丢包这一拍不发新目标
+                    step_arm(hold_posture(env.arm, config.arm.num_joints), observe=False)
                     time.sleep(period)
                     continue
 
@@ -2348,7 +2476,7 @@ def main() -> int:
                 preview = (link is not None and not recording
                            and link.frame_due(preview_interval))
                 # gripper 为 None 时 env 不碰夹爪（OmniPicker 还没按过空格）
-                obs = env.step_joints(q_cmd, gripper, observe=recording or preview)
+                obs = step_arm(q_cmd, gripper, observe=recording or preview)
 
                 qpos_now = None
                 if log_now:
@@ -2459,10 +2587,28 @@ def main() -> int:
         if watch.notes:
             print(f"  本次臂有 {len(watch.notes)} 次没完全跟上，最后一条：")
             print("  " + watch.notes[-1].strip())
+        if getattr(mapper, "log_files", None) is not None:
+            try:
+                mapper.flush_log()          # 接合着直接 q 退出的那一段
+            except Exception as exc:        # noqa: BLE001  诊断记录写不出来不该挡住收尾
+                print(f"  ⚠ 逐帧诊断记录没写出来：{exc}")
+            if mapper.log_files:
+                print(f"  逐帧诊断记录 {len(mapper.log_files)} 段：{Path(mapper.log_files[0]).parent}")
         if schedule.recording and len(recorder) > 0:
             # 录到一半按 q，意思是不要了。以前这里会偷偷存下来，结果是
             # 「我只录了一条，怎么出来两条」。要留就先按 s 正常结束。
             print(f"  这条录了 {len(recorder)} 帧，没按 s 结束，不保存")
+
+        if streamer is not None:
+            print("  " + streamer.report())
+            try:
+                # 先让排队的 MoveL 走完、清队列，再 close —— close 里的 arm.stop() 在排队模式下
+                # 是 robot.stop()，这台 AR5 上等于掉电（实时模式退出时电机本来也会掉电，结果一样），
+                # 别在臂还在动的时候切
+                if not streamer.halt(timeout=5.0):
+                    print("  ⚠ MoveL 队列 5 秒内没停下")
+            except Exception as exc:                    # noqa: BLE001
+                print(f"  ⚠ 停 MoveL 队列失败：{exc}")
 
         # 最后一条还在后台写。这里不等就会随进程一起消失 —— 硬件先放，
         # 因为写盘可能要几秒，臂和主臂没必要一直占着。

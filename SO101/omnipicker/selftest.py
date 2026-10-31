@@ -129,10 +129,10 @@ def _():
 
 # ── 参数校验 ────────────────────────────────────────────────────────
 
-@check("配置拒绝 open_force<64、open_max>210、夹持力出界")
+@check("配置拒绝 open_force<64、open_max>210、open_limit>open_max、夹持力出界")
 def _():
     for bad in (dict(open_force=32), dict(open_max=255), dict(open_max=220), dict(grip_force=200),
-                dict(grip_force=16), dict(addr=0)):
+                dict(grip_force=16), dict(addr=0), dict(open_limit=211), dict(open_max=170)):
         try:
             OmniPickerConfig(**bad)
         except ValueError:
@@ -180,7 +180,7 @@ def _():
         raise AssertionError("带错误码没被拒绝")
 
 
-@check("张开：目标封顶 210，张开方向的力不低于 open_force")
+@check("张开：目标封顶 open_limit 180，张开方向的力不低于 open_force")
 def _():
     gripper, bus = make(grip_force=32)
     gripper.connect()
@@ -188,8 +188,22 @@ def _():
         gripper.set_opening(1.0)
         assert wait_for(lambda: bus.commands), "没发指令"
         pos, _vel, force, _acc, _dec = bus.commands[0]
-        assert pos == 210, pos
+        assert pos == 180, pos
         assert force == 64, f"张开用了力 {force}，应该是 open_force 64"
+    finally:
+        gripper.disconnect()
+
+
+@check("开度仍按 open_max 210 换算（和已有数据一致），只有目标被 open_limit 封顶")
+def _():
+    gripper, bus = make(FakeBus(pos=123))
+    assert gripper.target_position(0.5) == 105
+    assert gripper.target_position(170 / 210) == 170
+    assert gripper.target_position(0.9) == 180 and gripper.target_position(1.0) == 180
+    gripper.connect()
+    try:
+        assert wait_for(lambda: gripper.last_status())
+        assert abs(gripper.get_opening() - 123 / 210) < 1e-6, gripper.get_opening()
     finally:
         gripper.disconnect()
 
@@ -286,7 +300,7 @@ def _():
     gripper.connect()
     try:
         gripper.set_opening(1.0)
-        assert wait_for(lambda: abs(bus.pos - 210) < 1)
+        assert wait_for(lambda: abs(bus.pos - gripper.config.open_limit) < 1)
         bus.frozen = True                           # 停在目标上、状态仍是移动中
         time.sleep(0.6)
         gripper.check_health()

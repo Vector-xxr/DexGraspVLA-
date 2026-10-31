@@ -2,7 +2,8 @@
 
 接口和 atom_robot 的 `HandDriver` 一样（connect / disconnect / set_opening /
 get_opening / get_joint_angles / check_health），另外多了调夹持力的几个方法。
-opening 0 = 合拢、1 = 张开到 `open_max`。
+opening 0 = 合拢、1 = 位置 `open_max`（换算基准）；张开目标另由 `open_limit` 封顶，
+所以 set_opening(1) 实际只开到 open_limit，读回来的开度约 0.86。
 
 **自适应**的意思：给「合到 0」它就合到碰上东西为止，然后按夹持力一直夹着，
 不会越夹越紧；夹手和空夹的力矩读数一样（2026-10-19 实测）。所以主臂扳机捏到底
@@ -10,9 +11,10 @@ opening 0 = 合拢、1 = 张开到 `open_max`。
 
 这一层守的规矩（都是 2026-10-19 / 20 在实物上踩出来的，见 README）：
 
-* 张开目标不超过 `open_max`（210），张开方向的力不低于 `open_force`（64）——
-  两者任一不守，都可能冲过 255 回绕，固件跟着乱、卡在张开端，只能断电重启。
-  （上限原来是 240，从夹紧状态松开时冲过头回绕过一次，10-20 实测后降到 210。）
+* 张开目标不超过 `open_limit`（180），张开方向的力不低于 `open_force`（64）——
+  两者任一不守，都可能冲过头、卡在张开端或冲过 255 回绕，只能断电重启。
+  （上限原来是 240，从夹紧状态松开时冲过头回绕过一次，10-20 实测后降到 210；
+  10-30 在 210 又冲过头、卡在张开端两次，降到 180。）
 * 位置一个周期内跳变超过 100 判回绕：停发、报错、要求断电重启。物理上全速一个
   周期（20 ms）最多走 6 个单位。
 * 「移动中」、离目标还远、位置却不动，持续 `stuck_seconds` 判卡死，停发报错。
@@ -194,9 +196,14 @@ class OmniPickerGripper:
         if not math.isfinite(value):
             raise ValueError("夹爪开合必须为有限数")
         self.check_health()
-        target = round(max(0.0, min(1.0, value)) * self.config.open_max)
+        target = self.target_position(value)
         with self._lock:
             self._target = target
+
+    def target_position(self, opening) -> int:
+        """开度 0~1 实际会下发的位置：按 open_max 换算，再按 open_limit 封顶。"""
+        cfg = self.config
+        return min(round(max(0.0, min(1.0, float(opening))) * cfg.open_max), cfg.open_limit)
 
     def get_opening(self):
         self.check_health()

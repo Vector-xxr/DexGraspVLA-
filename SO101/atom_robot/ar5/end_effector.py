@@ -55,7 +55,7 @@ def configure_end_effector(config, args):
             op = config.omnipicker
             print(f"  OmniPicker 485 {op.port} @{op.baudrate} addr={op.addr} "
                   f"夹持力={op.grip_force}（{op.grip_force_min}~{op.grip_force_max}，↑↓ 调） "
-                  f"速度={op.speed}（{op.speed_min}~{op.speed_max}，←→ 调） 张开上限={op.open_max}")
+                  f"速度={op.speed}（{op.speed_min}~{op.speed_max}，←→ 调） 张开上限={op.open_limit}（开度按 {op.open_max} 换算）")
     if config.use_hand and config.end_effector == "hkvr":
         print(f"  HKVR-TG9801 {config.hkvr.transport} {config.hkvr.port} "
               f"@{config.hkvr.baudrate} id={config.hkvr.slave_id} "

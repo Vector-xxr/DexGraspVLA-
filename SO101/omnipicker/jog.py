@@ -87,9 +87,9 @@ def main():
     gripper.connect()
     try:
         print(f"  固件 {gripper.firmware}  夹持力 {gripper.grip_force}  速度 {cfg.speed}  "
-              f"张开上限 {cfg.open_max}")
+              f"张开上限 {cfg.open_limit}（开度换算基准 {cfg.open_max}）")
         if args.opening is not None:
-            target = round(max(0.0, min(1.0, args.opening)) * cfg.open_max)
+            target = gripper.target_position(args.opening)
             print(f"== 走到开度 {args.opening:.2f}（位置 {target}）")
             gripper.set_opening(args.opening)
             _watch(gripper, 4.0, until=lambda s: s["vel"] == 0 and abs(s["pos"] - target) <= 2)
@@ -109,7 +109,7 @@ def main():
                 _watch(gripper, args.hold / 2)
             print("== 松开")
             gripper.set_opening(1.0)
-            _watch(gripper, 4.0, until=lambda s: s["vel"] == 0 and abs(s["pos"] - cfg.open_max) <= 2)
+            _watch(gripper, 4.0, until=lambda s: s["vel"] == 0 and abs(s["pos"] - cfg.open_limit) <= 2)
     finally:
         gripper.disconnect()
     return 0

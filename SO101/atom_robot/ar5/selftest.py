@@ -1613,6 +1613,541 @@ def _():
     assert info["reason"], info
 
 
+@check("tool-point Jacobian matches finite differences of flange @ tool")
+def _():
+    kin, q0 = _kin()
+    tool = np.eye(4)
+    tool[2, 3] = 0.13
+    _, J = kin.pose_and_jacobian(q0, tool)
+    eps = 1e-6
+    for i in range(7):
+        dq = np.zeros(7)
+        dq[i] = eps
+        dp = ((kin.fk(q0 + dq) @ tool)[:3, 3] - (kin.fk(q0 - dq) @ tool)[:3, 3]) / (2 * eps)
+        assert np.allclose(J[:3, i], dp, atol=1e-4), f"joint {i}: {J[:3, i]} vs {dp}"
+
+
+@check("weighted IK reaches reachable targets within a few frames")
+def _():
+    kin, q0 = _kin()
+    rng = np.random.default_rng(5)
+    residuals = []
+    for _ in range(100):
+        target = np.clip(q0 + rng.normal(0, 0.06, 7), kin.joint_min, kin.joint_max)
+        T = kin.fk(target)
+        q = q0.copy()
+        for _frame in range(3):         # unbounded step, 8 iterations a frame
+            q, info = kin.ik_weighted(T, q)
+        assert np.all(q >= kin.joint_min - 1e-9) and np.all(q <= kin.joint_max + 1e-9)
+        residuals.append(info["pos_error"])
+    assert np.median(residuals) < 5e-4, f"median residual {np.median(residuals)} m"
+
+
+@check("weighted IK never fails: unreachable target -> bounded step toward it, inside limits")
+def _():
+    kin, q0 = _kin()
+    T = kin.fk(q0)
+    T[0, 3] += 5.0
+    step = 0.0137
+    q, info = kin.ik_weighted(T, q0, step_limit=step)
+    assert q is not None and np.all(np.isfinite(q))
+    assert np.max(np.abs(q - q0)) <= step + 1e-12, np.max(np.abs(q - q0))
+    assert np.all(q >= kin.joint_min - 1e-9) and np.all(q <= kin.joint_max + 1e-9)
+    assert kin.fk(q)[0, 3] > kin.fk(q0)[0, 3], "should move toward the target"
+    assert info["bounded"], "an unreachable target should leave joints on the step bound"
+
+
+@check("weighted IK gives up orientation, not position, when the wrist cannot follow")
+def _():
+    # 主臂手腕要出 AR5 手腕给不了的姿态时（10-30 真机笛卡尔卡住的主因），位置照样要跟上
+    from atom_robot.ar5.transforms import axis_angle_to_matrix
+    kin, q0 = _kin()
+    T = kin.fk(q0)
+    T[:3, :3] = axis_angle_to_matrix(np.array([0.0, 2.5, 0.0])) @ T[:3, :3]   # 143 deg
+    T[2, 3] += 0.02
+    assert kin.ik(T, q0)[0] is None, "premise: dls cannot solve this"
+    q = q0.copy()
+    for _frame in range(5):
+        q, info = kin.ik_weighted(T, q)
+    assert info["pos_error"] < 3e-3, f"position should still track: {info['pos_error']} m"
+    assert info["rot_error"] > 0.3, "the orientation was the part that had to give"
+
+
+@check("cartesian mapper: default is the original dls at the flange; weighted is opt-in")
+def _():
+    from atom_robot.ar5.cartesian_mapping import (CartesianMapConfig, _clip_step,
+                                                  _hold_if_small)
+    from atom_robot.ar5.config import CollectConfig
+    c = CartesianMapConfig()
+    assert (c.ik, c.tcp_z) == ("dls", 0.0)
+    for bad in (dict(ik="mink"), dict(tcp_z=-0.01), dict(tcp_z=1.0)):
+        try:
+            CartesianMapConfig(**bad)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"accepted {bad}")
+    cc = CollectConfig()
+    assert (cc.cart_ik, cc.cartesian_tcp_z()) == ("dls", 0.0)
+    cc.cart_ik = "weighted"
+    assert cc.cartesian_tcp_z() == 0.13
+    cc.tcp_z = 0.0
+    assert cc.cartesian_tcp_z() == 0.0
+
+    T0 = np.eye(4)
+    T1 = np.eye(4)
+    T1[0, 3] = 0.002
+    assert np.allclose(_hold_if_small(T0, T1, 0.003, 0.03), T0), "inside the deadband"
+    T1[0, 3] = 0.05
+    assert np.allclose(_hold_if_small(T0, T1, 0.003, 0.03), T1)
+    assert np.isclose(_clip_step(T0, T1, 0.008, 0.06)[0, 3], 0.008), "clipped to 8 mm"
+
+
+@check("cartesian mapper weighted: no frozen frames, every step within the env rate limit")
+def _():
+    from atom_robot.ar5.cartesian_mapping import CartesianMapConfig, CartesianMapper
+    from atom_robot.ar5.joint_mapping import JOINT_PAIRS
+    arm = AR5Config().arm
+    try:
+        m = CartesianMapper(arm, arm.workspace_min, arm.workspace_max,
+                            config=CartesianMapConfig(ik="weighted", tcp_z=0.13))
+    except (FileNotFoundError, OSError) as exc:
+        raise Skip(f"主臂 URDF 或标定文件不在：{exc}")
+    m.configure({n: 90.0 for n, _, _ in JOINT_PAIRS}, arm.joint_min, arm.joint_max,
+                margin=arm.joint_limit_margin)
+    q = np.clip(m.centre, arm.joint_min, arm.joint_max)
+    m.engage(q)
+    worst = 0.0
+    for k in range(300):
+        s = k / 50
+        # 手腕大幅转动 + 肩大幅摆动：dls 在这段轨迹上会大面积解不出
+        joints = {"shoulder_pan": 40 * np.sin(0.5 * s), "shoulder_lift": -10 + 35 * np.sin(0.3 * s),
+                  "elbow_flex": 20.0, "wrist_flex": 30 + 50 * np.sin(0.7 * s),
+                  "wrist_roll": 60 * np.sin(0.4 * s), "gripper": 0.0}
+        q_next = m.compute(joints, q)
+        worst = max(worst, float(np.max(np.abs(q_next - q))))
+        q = q_next
+    assert m.stats["ik_fail"] == 0, m.stats
+    assert worst < arm.joint_goal_step, f"step {worst} >= rate limit {arm.joint_goal_step}"
+
+
+@check("cartesian: rotation scale follows --scale under weighted only; --cart-log writes a segment per engagement")
+def _():
+    import tempfile
+    from atom_robot.ar5.cartesian_mapping import CartesianMapConfig, CartesianMapper
+    from atom_robot.ar5.config import CollectConfig
+    from atom_robot.ar5.joint_mapping import JOINT_PAIRS
+    cc = CollectConfig()
+    assert cc.cartesian_rot_scale() == 1.0, "dls keeps the original 1:1 rotation"
+    cc.cart_ik = "weighted"
+    assert cc.cartesian_rot_scale() == cc.scale
+    cc.rot_scale = 0.8
+    assert cc.cartesian_rot_scale() == 0.8
+
+    arm = AR5Config().arm
+    with tempfile.TemporaryDirectory() as tmp:
+        for ik in ("dls", "weighted"):
+            try:
+                m = CartesianMapper(arm, arm.workspace_min, arm.workspace_max,
+                                    config=CartesianMapConfig(ik=ik, log_dir=f"{tmp}/{ik}"))
+            except (FileNotFoundError, OSError) as exc:
+                raise Skip(f"主臂 URDF 或标定文件不在：{exc}")
+            m.configure({n: 90.0 for n, _, _ in JOINT_PAIRS}, arm.joint_min, arm.joint_max,
+                        margin=arm.joint_limit_margin)
+            q = np.clip(m.centre, arm.joint_min, arm.joint_max)
+            joints = {"shoulder_pan": 0.0, "shoulder_lift": -10.0, "elbow_flex": 20.0,
+                      "wrist_flex": 30.0, "wrist_roll": 0.0, "gripper": 0.0}
+            for segment in range(2):
+                m.engage(q)
+                for k in range(20):
+                    joints["shoulder_pan"] = segment * 5 + k * 0.5
+                    q = m.compute(joints, q)
+                m.disengage()
+            m.disengage()                   # 空的一段不写文件
+            assert len(m.log_files) == 2, m.log_files
+            rows = np.load(m.log_files[0])["rows"]
+            assert rows.shape[1] == 47 and len(rows) == 19, rows.shape   # 第一帧取锚点，不记
+            assert np.all(np.isfinite(rows[:, 32:39])), "q_out"
+
+        m = CartesianMapper(arm, arm.workspace_min, arm.workspace_max, config=CartesianMapConfig())
+        m.engage(q)
+        m.compute(joints, q)
+        m.disengage()
+        assert m.log_files == [], "logging is off by default"
+
+
+# ---------------------------------------------- --ik sdk：排队式 MoveL 流（假控制器）
+
+
+class _FakeMoveLSdk:
+    """MoveLStreamer 用到的那几个 SDK 符号。"""
+
+    class CoordinateType:
+        flangeInBase = "flangeInBase"
+
+    class OperationState:
+        idle, moving = "idle", "moving"
+
+    class MotionControlMode:
+        NrtCommandMode = "nrt"
+
+    class OperateMode:
+        automatic = "automatic"
+
+    class CartesianPosition:
+        def __init__(self):
+            self.trans, self.rpy = [0.0] * 3, [0.0] * 3
+            self.elbow, self.hasElbow, self.confData = 0.0, False, []
+
+    class MoveLCommand:
+        def __init__(self, target):
+            self.target, self.speed, self.zone = target, 0.0, 0.0
+
+    @staticmethod
+    def PyString(s):
+        return s
+
+
+class _FakeMoveLRobot:
+    """假控制器：真的排队、真的判运动中；`finish()` 把队列一下走完（测试里代替时间流逝）。
+    每个方法都按 SDK 的规矩收尾部的 ec 字典，返回码照真机：运动中 moveReset / moveStart 回 -20，
+    队列空 moveStart 回 768。"""
+
+    def __init__(self, tool_z=0.0):
+        from types import SimpleNamespace
+        from atom_robot.ar5.transforms import matrix_to_rpy
+        self.T = np.eye(4)
+        self.T[:3, 3] = [0.45, 0.0, 0.30]
+        self.T[:3, :3] = np.diag([1.0, -1.0, -1.0])
+        self._rpy = matrix_to_rpy
+        self.elbow, self.conf = 0.3, [1, 0, 1, 0, 0, 0, 0, 0]
+        self.queue, self.moving = [], False
+        self.calls = []
+        self._tool = SimpleNamespace(end=SimpleNamespace(trans=[0.0, 0.0, tool_z], rpy=[0.0] * 3))
+
+    def _log(self, name):
+        self.calls.append(name)
+
+    def operationState(self, ec):
+        return "moving" if self.moving else "idle"
+
+    def cartPosture(self, _ct, ec):
+        from types import SimpleNamespace
+        return SimpleNamespace(trans=self.T[:3, 3].tolist(), rpy=self._rpy(self.T[:3, :3]).tolist(),
+                               elbow=self.elbow, confData=list(self.conf))
+
+    def moveReset(self, ec):
+        self._log("moveReset")
+        if self.moving:
+            ec["ec"] = -20
+        else:
+            self.queue = []
+
+    def moveAppend(self, cmds, _cid, ec):
+        self._log("moveAppend")
+        self.queue += list(cmds)
+
+    def moveStart(self, ec):
+        self._log("moveStart")
+        if self.moving:
+            ec["ec"] = -20
+        elif not self.queue:
+            ec["ec"] = 768
+        else:
+            self.moving = True
+
+    def finish(self):
+        from atom_robot.ar5.transforms import rpy_to_matrix
+        if self.queue:
+            last = self.queue[-1].target
+            self.T[:3, 3] = last.trans
+            self.T[:3, :3] = rpy_to_matrix(last.rpy)
+        self.queue, self.moving = [], False
+
+    def toolset(self, ec):
+        return self._tool
+
+    def powerState(self, ec):
+        return "PowerState.on"
+
+    def __getattr__(self, name):
+        # setMotionControlMode / setPowerState / setDefault* …：记下来、什么都不做
+        if name.startswith("set"):
+            return lambda *a: self._log(name)
+        raise AttributeError(name)
+
+
+def _streamer(**kw):
+    from atom_robot.ar5.movel_stream import MoveLStreamer
+    robot = _FakeMoveLRobot(tool_z=kw.pop("tool_z", 0.0))
+    return robot, MoveLStreamer(robot, _FakeMoveLSdk, **kw)
+
+
+@check("MoveL stream: configure never writes the tool, and refuses a non-zero tool instead of fixing it")
+def _():
+    robot, s = _streamer()
+    assert s.configure(log=lambda *_: None)
+    assert "setToolset" not in robot.calls, "setToolset 持久化、带负载写会掉电，不许碰"
+    assert robot.calls.index("setMotionControlMode") < robot.calls.index("setPowerState")
+    robot, s = _streamer(tool_z=0.097)
+    assert not s.configure(log=lambda *_: None), "工具不是 0 时法兰目标会整体偏掉，必须拒绝"
+    assert "setToolset" not in robot.calls
+
+
+@check("MoveL stream: deadband, append with the current elbow, start only when idle")
+def _():
+    robot, s = _streamer()
+    s.start()
+    T = robot.T.copy()
+    T[0, 3] += 0.0005                      # 0.5 mm < 1 mm 死区
+    s.submit(T)
+    assert s.flush() == "tiny" and not robot.queue
+    T[0, 3] += 0.005
+    robot.elbow = 0.42                     # 「current」每次下发前刷新臂角
+    s.submit(T)
+    s.flush()
+    assert len(robot.queue) == 1 and robot.moving, "空闲时追加完要 moveStart"
+    cmd = robot.queue[0]
+    assert (cmd.speed, cmd.zone) == (600.0, 100.0)
+    assert cmd.target.hasElbow and cmd.target.elbow == 0.42
+    assert np.allclose(cmd.target.trans, T[:3, 3])
+    T[0, 3] += 0.005                       # 运动中再追加：不再 moveStart，-20 不算失败
+    s.submit(T)
+    s.flush()
+    assert len(robot.queue) == 2 and s.stats["start_failed"] == 0
+
+
+@check("MoveL stream: the time backlog gate stops tiny segments from piling up (10-31 延迟 1.9 s 的 bug)")
+def _():
+    # 真机上 0.1 mm 的碎段每段也要 ~90 ms，距离预算挡不住。按时间估算的积压超过上限就先不发，
+    # 只留最新目标，臂停下（队列走空）再发
+    robot, s = _streamer()
+    s.start()
+    T = robot.T.copy()
+    for k in range(20):                    # 运动中连发 20 个各 4 mm 的目标
+        T[0, 3] += 0.004
+        s.submit(T)
+        s.flush()
+    est = len(robot.queue) * s.segment_seconds(0.004)
+    assert len(robot.queue) <= 3, f"运动中排进去 {len(robot.queue)} 段，积压闸门没挡住"
+    assert s.stats["skipped_backlog"] > 0 or s.flush() == "backlog"
+    assert est <= s.max_backlog + s.segment_seconds(0.004) + 1e-9
+    robot.finish()
+    start = robot.T[:3, 3].copy()
+    s.submit(T)
+    s.flush()
+    # 臂停下后只发一段、直奔最新目标（中间的不补），长度受距离预算限制
+    assert len(robot.queue) == 1
+    sent = np.asarray(robot.queue[0].target.trans)
+    step = sent - start
+    want = T[:3, 3] - start
+    assert np.allclose(step / np.linalg.norm(step), want / np.linalg.norm(want), atol=1e-6)
+    assert np.linalg.norm(step) <= s.max_lead + 1e-9
+    assert s.segment_seconds(0.0001) == s.MIN_SEGMENT_S
+
+
+@check("MoveL stream batch=10: one moveAppend per 10 points, refill only when <=3 are left, newest kept")
+def _():
+    robot, s = _streamer(batch=10)
+    s.start()
+    T = robot.T.copy()
+    sizes = []
+    real_append = robot.moveAppend
+
+    def counting_append(cmds, cid, ec):
+        sizes.append(len(cmds))
+        real_append(cmds, cid, ec)
+
+    robot.moveAppend = counting_append
+    for k in range(25):                    # 臂不推进（假控制器），主臂每拍走 2 mm
+        T[0, 3] += 0.002
+        s.submit(T.copy())
+        s.flush()
+    # 第 2 拍过死区、臂空闲 -> 不满一批也发（起步）；之后臂在动 -> 攒满 10 个才发；
+    # 再之后队列里剩 12 个 > 3 -> 不发
+    assert sizes == [2, 10], sizes
+    assert s.stats["skipped_queue"] > 0
+    robot.finish()                         # 臂走完、空闲：缓冲里 13 个，只取最新 10 个
+    s.flush()
+    assert sizes[-1] == 10 and np.allclose(robot.queue[-1].target.trans, T[:3, 3])
+    assert s.stats["decimated"] == 3
+
+
+@check("MoveL stream batch: duplicate points are dropped (controller refuses points 0.01 mm apart)")
+def _():
+    robot, s = _streamer(batch=10)
+    s.start()
+    A, B = robot.T.copy(), robot.T.copy()
+    A[0, 3] += 0.005
+    B[0, 3] += 0.010
+    for P in (A, A, A, B):
+        s.submit(P)
+    s.flush()                              # 臂空闲：不满一批也发
+    assert len(robot.queue) == 2 and s.stats["deduped"] == 2, (len(robot.queue), s.stats["deduped"])
+    s.submit(B)                            # 和上一个已发的点一样：不发
+    for _ in range(12):
+        s.submit(B)
+    s.flush()
+    assert len(robot.queue) == 2
+
+
+@check("MoveL stream merge: collinear points collapse to one segment, corners and orientation turns survive")
+def _():
+    from atom_robot.ar5.transforms import axis_angle_to_matrix
+    robot, s = _streamer(batch=10, merge_mm=2.0)
+    assert s.refill_at == 1
+    base = robot.T.copy()
+
+    def pose(dx, dy=0.0, rot=0.0):
+        P = base.copy()
+        P[0, 3] += dx
+        P[1, 3] += dy
+        P[:3, :3] = axis_angle_to_matrix(np.array([0.0, 0.0, rot])) @ base[:3, :3]
+        return P
+
+    line = [pose(0.002 * k + 0.0003 * (k % 2)) for k in range(1, 11)]       # 直线 + 0.3 mm 抖动
+    assert len(s._simplify(base, line)) == 1, "共线的 10 个点该合成一段"
+    corner = [pose(0.004 * k) for k in range(1, 6)] + [pose(0.02, 0.004 * k) for k in range(1, 6)]
+    kept = s._simplify(base, corner)
+    assert len(kept) == 2 and np.allclose(kept[0][:3, 3], corner[4][:3, 3]), "L 形的拐点要留"
+    twist = [pose(0.002 * k, rot=(0.2 if k == 5 else 0.0)) for k in range(1, 11)]  # 中途转 11° 又转回
+    assert len(s._simplify(base, twist)) >= 2, "姿态中途拐了也要留"
+    smooth = [pose(0.002 * k, rot=0.02 * k) for k in range(1, 11)]          # 边走边匀速转
+    assert len(s._simplify(base, smooth)) == 1
+
+    s.start()
+    for P in line:
+        s.submit(P)
+    s.flush()
+    assert len(robot.queue) == 1 and s.stats["merged"] == 9
+
+
+@check("MoveL stream: the lead budget caps how far targets run ahead of the arm")
+def _():
+    robot, s = _streamer(backlog_ms=10_000)     # 这项只测距离预算，积压闸门放开
+    s.start()
+    T = robot.T.copy()
+    T[0, 3] += 0.010
+    s.submit(T)
+    s.flush()                              # 臂开始动，但「还没走」（假控制器不推进）
+    far = robot.T.copy()
+    far[0, 3] += 0.200
+    s.submit(far)
+    s.flush()
+    lead = np.linalg.norm(np.asarray(robot.queue[-1].target.trans) - robot.T[:3, 3])
+    assert lead <= s.max_lead + 1e-9, f"已下发目标领先 {lead * 1000:.1f} mm，超过预算 {s.max_lead * 1000:.0f} mm"
+    n = len(robot.queue)
+    s.submit(far)
+    assert s.flush() == "lead" and len(robot.queue) == n, "预算用光了就先不发"
+    robot.finish()
+    s.submit(far)
+    s.flush()
+    assert len(robot.queue) == 1 and robot.moving, "臂停下后接着往目标走"
+
+
+@check("MoveL stream: pause touches no SDK, halt waits for idle before moveReset, elbow=none sends no elbow")
+def _():
+    robot, s = _streamer()
+    s.start()
+    T = robot.T.copy()
+    T[2, 3] += 0.01
+    s.submit(T)
+    s.flush()
+    robot.calls.clear()
+    s.pause()
+    assert robot.calls == [] and not s.running
+    assert not s.halt(timeout=0.1), "臂还在动，halt 要等，不能硬 moveReset"
+    assert "moveReset" not in robot.calls
+    robot.finish()
+    assert s.halt(timeout=0.5) and robot.calls[-1] == "moveReset"
+
+    robot, s = _streamer(elbow="none")
+    s.start()
+    s.submit(T)
+    s.flush()
+    assert not robot.queue[0].target.hasElbow
+
+
+@check("MoveL stream step(): a target-less frame while engaged does not pause (10-31 真机臂不动的 bug)")
+def _():
+    # 照映射器的真实节奏喂：起步后 on_start 重锚 -> 下一拍取主臂锚点、没目标 -> 再下一拍才有目标。
+    # 第一版把「没目标」当成松开去 pause，于是永远在起步和暂停之间来回，一条指令都发不出去。
+    robot, s = _streamer()
+    state = {"anchor_frame": False, "reanchors": 0}
+
+    def reanchor():
+        state["anchor_frame"] = True
+        state["reanchors"] += 1
+
+    T = robot.T.copy()
+    for k in range(10):
+        T[0, 3] += 0.005                   # 大于 3 mm 死区
+        target = None if state["anchor_frame"] else T.copy()
+        state["anchor_frame"] = False
+        s.step(True, target, on_start=reanchor)
+    assert state["reanchors"] == 1, f"重锚了 {state['reanchors']} 次，在起步和暂停之间打转"
+    assert s.running and robot.queue, "接合着、主臂在动，就该有 MoveL 发出去"
+
+    robot.calls.clear()
+    s.step(False, None)
+    assert not s.running and "moveReset" not in robot.calls, "松开只停追加，不碰正在走的队列"
+
+
+@check("cartesian mapper ik=sdk: same relative target as the local solvers, handed over as a flange pose")
+def _():
+    from atom_robot.ar5.cartesian_mapping import CartesianMapConfig, CartesianMapper
+    from atom_robot.ar5.config import CollectConfig
+    from atom_robot.ar5.joint_mapping import JOINT_PAIRS
+    cc = CollectConfig()
+    assert not cc.sdk_mode()
+    cc.space, cc.cart_ik = "cartesian", "sdk"
+    assert cc.sdk_mode() and cc.cartesian_tcp_z() == 0.13 and cc.cartesian_rot_scale() == cc.scale
+    cc.sdk_elbow = "sometimes"
+    try:
+        cc.__post_init__()
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("accepted a bad sdk_elbow")
+
+    arm = AR5Config().arm
+    try:
+        m = CartesianMapper(arm, arm.workspace_min, arm.workspace_max,
+                            config=CartesianMapConfig(ik="sdk", tcp_z=0.13))
+    except (FileNotFoundError, OSError) as exc:
+        raise Skip(f"主臂 URDF 或标定文件不在：{exc}")
+    m.configure({n: 90.0 for n, _, _ in JOINT_PAIRS}, arm.joint_min, arm.joint_max,
+                margin=arm.joint_limit_margin)
+    q = np.clip(m.centre, arm.joint_min, arm.joint_max)
+    joints = {"shoulder_pan": 0.0, "shoulder_lift": -10.0, "elbow_flex": 20.0,
+              "wrist_flex": 30.0, "wrist_roll": 0.0, "gripper": 0.0}
+    m.engage(q)
+    m.compute(joints, q)                   # 第一帧取主臂锚点
+    assert m.sdk_target is None
+    joints["shoulder_pan"] = 5.0
+    out = m.compute(joints, q)
+    assert np.array_equal(out, q), "sdk 这一路不解逆解，关节原样返回"
+    assert m.sdk_target is not None
+    assert np.allclose(m.sdk_target @ m._tool, m._diag["target_used"]), "交出去的是法兰，不是指尖"
+    m.disengage()
+    m.compute(joints, q)
+    assert m.sdk_target is None, "松开后不能再给目标"
+
+
+@check("TrackingWatch reports MoveL failures and frequent queue restarts")
+def _():
+    from types import SimpleNamespace
+    from atom_robot.ar5.collect import TrackingWatch
+    mapper = SimpleNamespace(stats={})
+    arm = SimpleNamespace(rt_stats=lambda: {"rejected": {}})
+    streamer = SimpleNamespace(stats={"execution_errors": 0, "start_failed": 0, "restarts": 0})
+    w = TrackingWatch(mapper, arm, np.zeros(7), np.ones(7), period=0.0, streamer=streamer)
+    streamer.stats["execution_errors"] = 1
+    streamer.stats["restarts"] = 5
+    line = w.check(1.0, np.zeros(7))
+    assert line and "MoveL 失败 1" in line and "重启 5" in line, line
+
+
 # --------------------------------------------------- real-time joint limiter
 
 

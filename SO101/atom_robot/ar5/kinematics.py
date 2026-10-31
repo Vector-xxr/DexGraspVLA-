@@ -290,6 +290,108 @@ class AR5Kinematics:
         info["reason"] = f"did not converge in {max_iters} iterations"
         return None, info
 
+    def pose_and_jacobian(self, q: np.ndarray, tool: Optional[np.ndarray] = None):
+        """(4x4 pose, 6x7 geometric Jacobian) of the flange, or of `flange @ tool`.
+
+        With a tool the linear rows are taken about the tool point, so a
+        position cost penalises the fingertip, not the flange.
+        """
+        T, axes, origins = self._chain(q)
+        if tool is not None:
+            T = T @ tool
+        p_end = T[:3, 3]
+        J = np.zeros((6, self.num_joints))
+        for i in range(self.num_joints):
+            J[:3, i] = np.cross(axes[i], p_end - origins[i])
+            J[3:, i] = axes[i]
+        return T, J
+
+    def ik_weighted(
+        self,
+        T_target: np.ndarray,
+        q_seed: np.ndarray,
+        q_posture: Optional[np.ndarray] = None,
+        step_limit: Optional[float] = None,
+        tool: Optional[np.ndarray] = None,
+        iters: int = 8,
+        position_cost: float = 50.0,
+        orientation_cost: float = 0.15,
+        posture_cost: float = 0.02,
+        damping_cost: float = 0.2,
+        lm_damping: float = 2.0,
+        solver_damping: float = 0.08,
+        pos_tol: float = 1e-4,
+    ) -> Tuple[np.ndarray, dict]:
+        """Weighted, bounded least squares IK that never fails -- the teleop solver.
+
+        Ported from SO101-OpenArm_teleop (github.com/Vector-xxr/SO101-OpenArm_teleop,
+        `openarm_ik.py`), which drives mink's FrameTask + PostureTask +
+        DampingTask under a ConfigurationLimit. Only the maths is ported; the
+        kinematics stay this class's calibrated DH. Each of `iters` steps solves
+
+            min  |W (J dq - e)|^2 + mu |dq|^2 + wp^2 |dq - (q_posture - q)|^2
+                 + wd^2 |dq|^2 + solver_damping |dq|^2
+            s.t. q + dq inside the joint limits and within `step_limit` of q_seed
+
+        with W = diag(position_cost x3, orientation_cost x3) and the
+        Levenberg-Marquardt term mu = lm_damping |W e|^2.
+
+        What differs from `ik`:
+
+        * No convergence requirement. An unreachable target returns the best
+          compromise reachable from the seed, so the arm slides along the edge
+          of its reach instead of freezing on the last solvable pose.
+        * Orientation is soft (0.15 against 50): the SO-101 leader has five
+          joints, so its pose can ask for a wrist attitude the AR5's +-50 deg
+          wrist cannot give, and position should win when it does.
+        * Joint limits and the per-frame joint step are hard bounds of the
+          solve, not clips applied afterwards, so the step a frame takes is
+          the best one the rate limit allows rather than a scaled-down copy of
+          a step it would not allow.
+
+        Returns (q, info); q is never None. info carries pos_error, rot_error
+        (of the returned q), iters, and `bounded`, the joints sitting on a bound.
+        """
+        from scipy.optimize import lsq_linear  # noqa: PLC0415
+
+        n = self.num_joints
+        seed = np.asarray(q_seed, dtype=np.float64).reshape(n)
+        lo, hi = self.joint_min.copy(), self.joint_max.copy()
+        if step_limit is not None and step_limit > 0:
+            lo = np.maximum(lo, seed - step_limit)
+            hi = np.minimum(hi, seed + step_limit)
+        # A seed already outside the limits leaves an empty box; widen to hold it
+        # where it is rather than yank it inside in one frame.
+        lo, hi = np.minimum(lo, seed), np.maximum(hi, seed)
+        q = seed.copy()
+        w = np.array([position_cost] * 3 + [orientation_cost] * 3)
+        eye = np.eye(n)
+        info = {"iters": 0, "pos_error": np.inf, "rot_error": np.inf, "bounded": []}
+
+        for it in range(iters):
+            T, J = self.pose_and_jacobian(q, tool)
+            e = self.pose_error(T, T_target)
+            if np.linalg.norm(e[:3]) < pos_tol and np.linalg.norm(e[3:]) < pos_tol * 10:
+                break
+            WJ, We = w[:, None] * J, w * e
+            H = WJ.T @ WJ + (lm_damping * float(We @ We) + solver_damping + damping_cost ** 2) * eye
+            g = WJ.T @ We
+            if q_posture is not None and posture_cost > 0:
+                H += posture_cost ** 2 * eye
+                g += posture_cost ** 2 * (np.asarray(q_posture, dtype=np.float64) - q)
+            # min 1/2 dq'H dq - g'dq  ==  min 1/2 |L' dq - L^-1 g|^2  with H = L L'
+            L = np.linalg.cholesky(H)
+            res = lsq_linear(L.T, np.linalg.solve(L, g), bounds=(lo - q, hi - q), method="bvls")
+            q = np.clip(q + res.x, lo, hi)
+            info["iters"] = it + 1
+
+        T = self.fk(q) if tool is None else self.fk(q) @ tool
+        e = self.pose_error(T, T_target)
+        info["pos_error"] = float(np.linalg.norm(e[:3]))
+        info["rot_error"] = float(np.linalg.norm(e[3:]))
+        info["bounded"] = [i for i in range(n) if q[i] <= lo[i] + 1e-9 or q[i] >= hi[i] - 1e-9]
+        return q, info
+
     # ------------------------------------------------------------------ helpers
 
     def near_singularity(self, q: np.ndarray, threshold: float = 0.01) -> bool:
